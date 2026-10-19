@@ -165,7 +165,8 @@ return {p,value:(x.value+y.value)/2+Math.min(x.value,y.value)*0.45+sharedNeed+co
 }
 function individual(a){
 const scores=traits.map((items,t)=>{let sum=0,max=0;items.forEach(([q,w],j)=>{max+=w;if(a[q]===traitChoices[t][j])sum+=w});return sum/max});
-// 탐험형은 실제 외부 활동 선호(첫 질문)가 없으면 주성향으로 과대 해석하지 않습니다.\nif(a[0]===0)scores[6]=Math.min(scores[6],0.49);\nlet order=scores.map((v,i)=>i).sort((x,y)=>scores[y]-scores[x]||x-y);
+// 탐험형은 실제 외부 활동 선호(첫 질문)가 없으면 주성향으로 과대 해석하지 않습니다.\nif(a[0]===0)scores[6]=Math.min(scores[6],0.49);
+let order=scores.map((v,i)=>i).sort((x,y)=>scores[y]-scores[x]||x-y);
 return {primary:order[0],secondary:order[1],scores,appliances:personalPicks(a)};
 }
 function coupleAnalyze(){
