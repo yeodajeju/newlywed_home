@@ -290,5 +290,22 @@ if(state.page==='event')app.innerHTML='<div class="eyebrow">A LITTLE GIFT FOR YO
 if(state.page==='report')app.innerHTML=reportPage(reportIndex)+'<div class="report-nav">'+(reportIndex>0?btn('이전 결과 보기','showReport('+(reportIndex-1)+')','secondary'):'')+(reportIndex<2?btn(reportIndex===0?'신랑님 라이프스타일 보기 →':'신부님 라이프스타일 보기 →','showReport('+(reportIndex+1)+')'):btn('처음부터 다시 하기','location.reload()'))+'</div>';
 }
 
+
+function loadPreviewFromUrl(){
+const params=new URLSearchParams(location.search);
+if(params.get('preview')!=='1')return;
+const scenario=params.get('case')||'balanced';
+const patterns={
+balanced:[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,0,1,1,1,1]],
+similar:[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
+different:[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]]
+};
+const chosen=patterns[scenario]||patterns.balanced;
+state.names=['신랑','신부'];
+state.answers=chosen.map(a=>a.slice());
+state.page='report';
+reportIndex=0;
+}
+loadPreviewFromUrl();
 render();
 </script></body></html>
