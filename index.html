@@ -22,7 +22,7 @@ main{box-shadow:0 18px 70px #65463a14}
 .report-view .report-nav{margin-top:30px}
 .report-view .primary{min-height:54px;box-shadow:0 7px 16px #b76f6526}
 @media(max-width:420px){.report-view .card{padding:23px 19px}.report-view .rec-list .rec{padding:21px 18px}.report-view .card p{font-size:13.5px}.report-view .rec-list .rec-evidence p{font-size:13.5px}}
-</style></head><body><main><div id="app"></div></main><script>
+.comparison-list{display:grid;gap:13px;margin:14px 0}.comparison-item{background:#fdf8f5;border:1px solid #f0e5df;border-radius:15px;padding:16px}.comparison-number{font:700 10px 'DM Sans',sans-serif;letter-spacing:1.5px;color:#b77b70;margin-bottom:8px}.comparison-question{font-weight:700;font-size:14px;line-height:1.65;margin-bottom:10px;word-break:keep-all}.comparison-shared{background:#fff;border-radius:9px;padding:11px 12px;color:#765b53;font-size:13px;line-height:1.65;word-break:keep-all}.comparison-pair{display:grid;grid-template-columns:1fr 1fr;gap:9px}.comparison-pair>div{background:#fff;border-radius:9px;padding:11px;min-width:0}.comparison-pair span{display:inline-block;color:#b57469;font-size:11px;font-weight:700;margin-bottom:5px}.report-view .comparison-pair p{font-size:12px;line-height:1.7;margin:0}.report-view .comparison-insight{border-top:1px solid #efe3dc;margin-top:17px;padding-top:16px;color:#655751;font-size:13.5px;line-height:1.9}.report-view .comparison-empty{font-size:13px;color:#877771}@media(max-width:360px){.comparison-pair{grid-template-columns:1fr}} </style></head><body><main><div id="app"></div></main><script>
 const questions=[
 ['모처럼 아무 약속 없는 토요일!','집에서 밀린 드라마를 보며 푹 쉬고 싶어요','일단 나가고 싶어요! 재미있는 일을 찾아볼래요'],
 ['여행을 떠나기 전날 밤, 나는?','일정부터 준비물까지 미리 챙겨두는 편이에요','짐은 금방 싸요! 필요한 것만 챙기면 돼요'],
@@ -255,25 +255,28 @@ const storyTopics=[
 [15,['두 분은 큰 물건을 고를 때 충분히 비교하고 납득하는 과정을 중요하게 여겨요. 신혼집을 꾸릴 때도 사용 기간과 관리 부담을 함께 따져보면 좋겠어요.','두 분은 마음에 드는 선택을 비교적 빠르게 결정할 수 있어요. 큰 지출에서는 미리 예산과 꼭 필요한 기능을 합의해 두면 더 만족스러운 선택이 될 수 있겠어요.'],['신랑님은 비교를 통해 확신을 얻고 신부님은 마음에 들면 빠르게 결정하는 편이에요. 구매 기준을 먼저 공유하면 서로의 속도 차이를 장점으로 바꿀 수 있어요.','신부님은 비교를 통해 확신을 얻고 신랑님은 마음에 들면 빠르게 결정하는 편이에요. 구매 기준을 먼저 공유하면 서로의 속도 차이를 장점으로 바꿀 수 있어요.']],
 [19,['두 분은 여유 시간이 생기면 함께 보내는 순간을 떠올려요. 거창한 계획보다 둘이 자연스럽게 마주하는 작은 일상이 신혼생활의 즐거움이 될 수 있어요.','두 분은 함께 살더라도 각자만의 시간을 존중하는 편이에요. 같은 집 안에서도 혼자 쉬고 집중할 수 있는 공간이 관계에 여유를 더할 수 있겠어요.'],['신랑님은 함께하는 시간을, 신부님은 혼자만의 시간을 중요하게 생각해요. 친밀함의 방식이 조금 다를 뿐 두 시간 모두 존중할 때 더 편안한 관계가 될 수 있어요.','신부님은 함께하는 시간을, 신랑님은 혼자만의 시간을 중요하게 생각해요. 친밀함의 방식이 조금 다를 뿐 두 시간 모두 존중할 때 더 편안한 관계가 될 수 있어요.']]
 ];
+const comparisonPriority=[19,10,8,0,15,5,6,3,2,17,11,13,14,4,7,9,12,16,1,18];
+function selectedComparisons(a,b,same,limit=2){
+return comparisonPriority.filter(i=>(a[i]===b[i])===same).slice(0,limit).map(i=>({question:questions[i][0],groom:questions[i][a[i]+1],bride:questions[i][b[i]+1]}));
+}
+function compareCards(items,same){
+if(!items.length)return '<p class="comparison-empty">이번에는 해당하는 질문이 없어요.</p>';
+return '<div class="comparison-list">'+items.map((item,i)=>'<div class="comparison-item"><div class="comparison-number">QUESTION '+String(i+1).padStart(2,'0')+'</div><div class="comparison-question">'+esc(item.question)+'</div>'+(same?'<div class="comparison-shared">'+esc(item.groom)+'</div>':'<div class="comparison-pair"><div><span>신랑</span><p>'+esc(item.groom)+'</p></div><div><span>신부</span><p>'+esc(item.bride)+'</p></div></div>')+'</div>').join('')+'</div>';
+}
 function deepCoupleStory(r,a,b){
-const same=storyTopics.filter(t=>a[t[0]]===b[t[0]]),diff=storyTopics.filter(t=>a[t[0]]!==b[t[0]]);
-const x=lifestyle[r.x.primary],y=lifestyle[r.y.primary],xs=lifestyle[r.x.secondary],ys=lifestyle[r.y.secondary];
-const sharedDetails=same.slice(0,3).map(t=>t[1][a[t[0]]]);
-const diffDetails=diff.slice(0,3).map(t=>t[2][a[t[0]]]);
-const common=sharedDetails.length?
-'두 분의 답변에서 눈에 띄는 공통점은 '+sharedDetails.join(' ')+' 이런 선택들이 함께 나타난다는 건 신혼집에서 편안함을 느끼는 장면이 꽤 닮아 있다는 뜻일 수 있어요. 서로 원하는 시간을 굳이 길게 설명하지 않아도 이해할 수 있는 순간이 생기겠죠. 특히 바쁜 하루가 끝났을 때 이런 공통의 취향은 두 사람만의 작은 루틴을 만드는 데 좋은 출발점이에요. 다만 같은 답을 골랐더라도 그 이유까지 같다고 단정하지 말고, 각자 어떤 순간이 가장 좋은지 이야기를 나눠 보세요.':
-'이번 답변에서는 생활의 여러 장면에서 서로 다른 선택을 했어요. 그렇다고 두 분 사이에 통하는 마음이 없다는 뜻은 아니에요. 오히려 어떤 시간을 함께 보내고 싶은지, 무엇을 편안하게 느끼는지 알아갈 기회가 많다는 의미일 수 있어요. 서로의 선택을 정답이나 오답으로 보지 않을 때 두 분만의 공통된 생활 방식도 조금씩 만들어질 거예요.';
-const different=diffDetails.length?
-'서로 다른 선택도 분명히 보여요. '+diffDetails.join(' ')+' 이런 차이는 한 사람이 더 부지런하거나 상대를 덜 배려해서 생기는 문제가 아니라, 편안함을 느끼는 순서와 방식이 다르기 때문일 수 있어요. 예를 들어 집안일과 휴식의 우선순위가 다르면 같은 저녁을 보내면서도 서로 다른 기대를 할 수 있죠. 그럴 때는 누가 맞는지 정하기보다 꼭 함께할 일과 각자 선택해도 되는 일을 구분해 보세요. 작은 약속 하나가 반복되는 서운함을 줄여줄 수 있어요.':
-'두 분은 살펴본 생활 장면에서 상당히 비슷한 선택을 했어요. 닮은 취향은 신혼 초기에 일상의 리듬을 맞추는 데 큰 장점이 될 수 있어요. 하지만 같은 선택을 했다는 이유로 언제나 같은 마음일 거라고 기대하면 뜻밖의 서운함이 생길 수도 있죠. 피곤한 날이나 바쁜 주간에는 원하는 방식이 달라질 수 있으니 가끔 서로의 컨디션을 확인해 주세요.';
-const synthesis='신랑님에게는 '+x[1]+' '+x[0]+'의 성향이 두드러지고, '+xs[0]+'의 모습도 함께 보여요. 신부님은 '+y[1]+' '+y[0]+'의 성향을 중심으로 '+ys[0]+'의 특징을 지니고 있어요. 그래서 같은 집을 꾸리더라도 신랑님이 중요하게 생각하는 생활의 기준과 신부님이 만족을 느끼는 순간이 꼭 일치하지는 않을 수 있어요. '+(r.x.primary===r.y.primary?'두 분의 중심 성향이 닮아 있다는 점은 큰 장점이지만, 보조 성향에서 드러나는 작은 차이도 존중해 보세요.':'서로 다른 중심 성향은 한쪽의 방식을 고집하기보다 각자의 강점을 생활에 나눠 담을 때 더욱 빛날 수 있어요.')+' 신혼집은 어느 한 사람의 취향을 완성하는 공간이 아니라 두 사람의 일상이 함께 자라는 곳이에요. 가전도 인기 순위보다는 두 분이 아끼고 싶은 시간과 줄이고 싶은 수고를 기준으로 고르면 더 만족스러운 선택이 될 거예요.';
-return {common,different,synthesis};
+const sameCount=a.filter((v,i)=>v===b[i]).length;
+const same=selectedComparisons(a,b,true),diff=selectedComparisons(a,b,false);
+const xp=lifestyle[r.x.primary],yp=lifestyle[r.y.primary];
+const common=sameCount>=15?'일상의 기준이 상당히 닮은 부부예요. 함께 결정할 때 서로의 마음을 이해하기 쉬운 편이겠어요.':sameCount>=8?'서로 통하는 지점과 각자의 취향이 균형 있게 공존하는 부부예요. 닮은 선택은 두 사람만의 편안한 일상을 만드는 바탕이 될 수 있어요.':'같은 선택의 수가 많지는 않지만, 함께 공감하는 지점은 분명히 있어요. 그 공통점을 두 사람만의 작은 생활 습관으로 발전시켜 보세요.';
+const different=sameCount===20?'모든 질문에서 같은 답을 골랐어요. 그래도 같은 선택을 한 이유까지 똑같지는 않을 수 있으니 서로의 생각을 가끔 확인해 보세요.':sameCount>=15?'차이는 크지 않지만 작은 생활 습관이 의외로 중요할 수 있어요. 다르게 고른 질문은 미리 대화해 볼 만한 주제예요.':'다른 선택은 잘못 맞춘 답이 아니라, 서로에게 필요한 생활의 조건을 알려주는 단서예요. 집안일의 순서나 각자의 여가 시간처럼 반복되는 일은 작은 약속부터 정해보면 좋아요.';
+const synthesis=r.x.primary===r.y.primary?'두 분 모두 '+xp[0]+'의 성향이 중심에 있어요. 생활의 우선순위가 비슷한 만큼 공통의 기준을 세우기 수월할 수 있어요. 다만 익숙한 방식만 고집하기보다 서로의 작은 취향도 살펴보세요.':'신랑님은 '+xp[0]+', 신부님은 '+yp[0]+'의 성향이 중심에 있어요. 서로 다른 강점이 만나면 생활의 선택지가 더 풍성해질 수 있어요. 누가 옳은지보다 어떤 방식이 두 사람 모두에게 편안한지 기준을 함께 만들어 보세요.';
+return {common,different,synthesis,same,diff};
 }
 function reportPage(n){
 let r=coupleAnalyze(),a=state.answers[0],b=state.answers[1],who=n===1?0:1,ind=who===0?r.x:r.y,profile=lifestyle[ind.primary],sub=lifestyle[ind.secondary];
 if(n===0){
 let story=deepCoupleStory(r,a,b);
-return '<div class="eyebrow">OUR NEWLYWED STORY · 01 / 03</div><div class="type-hero">'+titleIcon(r.type[1])+'<h2>'+r.type[0]+'</h2><p>'+r.type[2]+'</p></div><div class="card"><h3>💞 우리 부부가 통하는 것</h3><p>'+esc(story.common)+'</p></div><div class="card"><h3>🌙 우리 부부가 다른 것</h3><p>'+esc(story.different)+'</p></div><div class="card"><h3>🌿 우리의 생활 취향</h3><p>'+esc(story.synthesis)+'</p></div><h3>우리에게 딱 맞는 신혼 라이프를 위한 추천 가전</h3>'+listProducts(r.both,[a,b]);
+return '<div class="eyebrow">OUR NEWLYWED STORY · 01 / 03</div><div class="type-hero">'+titleIcon(r.type[1])+'<h2>'+r.type[0]+'</h2><p>'+r.type[2]+'</p></div><div class="card"><h3>💞 우리가 같은 선택을 한 질문</h3>'+compareCards(story.same,true)+'<p class="comparison-insight">'+esc(story.common)+'</p></div><div class="card"><h3>🌙 우리가 다르게 선택한 질문</h3>'+compareCards(story.diff,false)+'<p class="comparison-insight">'+esc(story.different)+'</p></div><div class="card"><h3>🌿 우리 부부의 생활 해석</h3><p>'+esc(story.synthesis)+'</p></div><h3>우리에게 딱 맞는 신혼 라이프를 위한 추천 가전</h3>'+listProducts(r.both,[a,b]);
 }
 return '<div class="eyebrow">OUR NEWLYWED STORY · 0'+(n+1)+' / 03</div><div class="type-hero">'+titleIcon(profile[2])+'<h2>'+esc(state.names[who])+'님은<br>'+profile[1]+' '+profile[0]+'이에요</h2><p>'+profile[3]+'</p></div><div class="card"><h3>🌿 선택 속에 담긴 생활의 기준</h3><p>'+individualInsight(ind)+'</p></div><div class="card"><h3>✨ 함께 드러난 또 하나의 기준</h3><p>'+secondaryInsight(ind)+'</p></div><h3>'+esc(state.names[who])+'님을 위한 추천 가전</h3>'+listProducts(ind.appliances,[state.answers[who]]);
 }
