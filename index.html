@@ -438,7 +438,7 @@ const button=document.getElementById('entrySubmit'),status=document.getElementBy
 entrySending=true;button.disabled=true;button.textContent='응모 정보를 전송하는 중이에요…';
 try{
 await fetch(ENTRY_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
-status.textContent='전송 요청을 보냈어요. 저장 성공 여부는 구글 시트에서 확인해야 해요.';
+status.textContent='제출이 완료되었습니다.';
 button.textContent='결과 보기';button.disabled=false;button.onclick=()=>showReport(0);
 }catch(e){
 status.textContent='전송 요청이 실패했어요. 인터넷 연결을 확인하고 다시 시도해 주세요.';
