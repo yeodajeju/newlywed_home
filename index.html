@@ -649,9 +649,10 @@ function interpretedStory(r,a,b){
  const different=pickDiff.length?pickDiff.map(q=>byQ(q).diff).join(' '):'핵심 생활 주제에서는 큰 차이가 드러나지 않았어요. 생활 환경이 달라질 때 서로의 생각을 확인하는 습관을 이어가면 좋아요.';
  const idx=Math.max(0,coupleTypes.findIndex(t=>t[0]===r.type[0]));
  const [headline,overview]=coupleTypeAnalysis[idx];
- const crossed=crossPattern(a,b);\n const bridge=pickSame.length&&pickDiff.length?'함께 중요하게 여기는 기준을 바탕으로 서로 다른 생활 방식에 여유를 주는 것이 두 분의 강점이 될 수 있어요.':pickSame.length?'서로 잘 맞는 기준이 있어도 실제 집안일과 소비에서는 역할과 예산을 구체적으로 정하는 과정이 중요해요.':'다른 답변이 많더라도 그 차이를 잘 알고 있다는 것 자체가 함께 생활을 꾸리는 출발점이 될 수 있어요.';
- const advice=crossed|| (pickDiff.length?byQ(pickDiff[0]).diff:pickSame.length?'공통된 취향을 유지하면서도 달라지는 생활 리듬을 한 달에 한 번쯤 이야기해 보세요.':'서로의 생활에서 중요한 기준을 한 가지씩 말해보세요.';
- return {same:cards(pickSame),diff:cards(pickDiff),common,different,synthesis:headline+'|'+overview+' '+bridge,advice};
+ const crossed=crossPattern(a,b);
+ const bridge=pickSame.length&&pickDiff.length?'함께 중요하게 여기는 기준을 바탕으로 서로 다른 생활 방식에 여유를 주는 것이 두 분의 강점이 될 수 있어요.':pickSame.length?'서로 잘 맞는 기준이 있어도 실제 집안일과 소비에서는 역할과 예산을 구체적으로 정하는 과정이 중요해요.':'다른 답변이 많더라도 그 차이를 잘 알고 있다는 것 자체가 함께 생활을 꾸리는 출발점이 될 수 있어요.';
+ const advice=crossed|| (pickDiff.length?byQ(pickDiff[0]).diff:pickSame.length?'공통된 취향을 유지하면서도 달라지는 생활 리듬을 한 달에 한 번쯤 이야기해 보세요.':'서로의 생활에서 중요한 기준을 한 가지씩 말해보세요.');
+ return {same:cards(pickSame),diff:cards(pickDiff),common,different,synthesis:headline+'|'+overview+' '+(crossed||bridge),advice};
 }
 function interpretedPersonal(ind,ans){
  const i=ind.primary,j=ind.secondary;
