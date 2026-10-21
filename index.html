@@ -146,21 +146,32 @@ const next=options[0];selected.push(next);groups.add(productGroups[next.p]);
 }
 return selected.map(x=>x.p);
 }
+const productAnchorQuestions={
+'식기세척기':[5,10,18],'로봇청소기':[8,10,18],'워시콤보':[7,10,18],
+'스타일러':[11,12],'바스에어':[13],'OLED TV':[17,0],
+'스탠바이미':[17,0],'STEM 얼음정수 냉장고':[14,2],
+'김치냉장고':[3,4],'드로어 냉장고':[3,5],
+'인덕션':[5],'광파오븐':[5]
+};
+function directProductMatch(p,ans){
+return (productEvidence[p]||[]).some(([q,v])=>ans[q]===v);
+}
 function personalPicks(ans,shared=[],other=[]){
 const hasOther=other.length===20;
 return selectDiverse(products.map(p=>{
 const own=productSignal(p,ans),otherSignal=hasOther?productSignal(p,other):{value:0};
-const edge=hasOther?Math.max(0,own.value-otherSignal.value)*0.24:0;
-const core=own.direct?2:-2.5;
-return {p,value:own.value+core+edge-(shared.includes(p)?1.4:0)};
+if(!directProductMatch(p,ans))return {p,value:-100};
+const edge=hasOther?Math.max(0,own.value-otherSignal.value)*0.18:0;
+return {p,value:own.value+2+edge-(shared.includes(p)?2:0)};
 }));
 }
 function sharedPicks(a,b){
 return selectDiverse(products.map(p=>{
 const x=productSignal(p,a),y=productSignal(p,b);
-const sharedNeed=x.direct&&y.direct?3:x.direct||y.direct?1:-2.5;
-const complement=x.direct!==y.direct&&Math.min(x.value,y.value)>1?1.2:0;
-return {p,value:(x.value+y.value)/2+Math.min(x.value,y.value)*0.45+sharedNeed+complement};
+const xa=directProductMatch(p,a),yb=directProductMatch(p,b);
+if(!xa&&!yb)return {p,value:-100};
+const both=xa&&yb;
+return {p,value:(x.value+y.value)/2+Math.min(x.value,y.value)*0.35+(both?3:0)-(both?0:1.7)};
 }));
 }
 function individual(a){
@@ -228,14 +239,32 @@ const recommendationAngles={
 'STEM 얼음정수 냉장고':{focus:'음료를 준비하는 작은 수고와 손님을 맞이하는 생활',result:'시원한 음료를 즐기고 손님을 맞이하는 순간을 편리하게 만들어줘요.',signals:[[14,0,'시원한 음료를 즐기는 취향'],[2,0,'손님을 초대하는 생활'],[19,0,'함께하는 시간을 중요하게 여기는 마음']]}
 };
 function recommendationNarrative(p,answers){
-const angle=recommendationAngles[p];if(!angle)return {basis:'생활 속 선택을 바탕으로 살펴봤어요.',benefit:productDescriptions[p]||'일상에 편리함을 더하는 선택이에요.'};
-const signals=angle.signals.filter(([q,v])=>answers.some(a=>a[q]===v)).map(x=>x[2]);
-const distinct=[...new Set(signals)].slice(0,2);
-const basis=distinct.length?distinct.join(' · '):'일상 속 생활 습관';
-return {basis,benefit:angle.result};
+const angle=recommendationAngles[p];
+const evidence=(productEvidence[p]||[]).filter(([q,v])=>answers.some(a=>a[q]===v));
+const first=evidence[0];
+if(!first)return {basis:'이번 답변만으로는 이 제품을 추천할 충분한 근거가 없어요.',benefit:productDescriptions[p]||''};
+const q=first[0],val=first[1];
+const theme=insightThemes.find(t=>t.q===q);
+const meaning=theme?theme.same[val]:'';
+const life=angle?angle.result:productDescriptions[p];
+const productReason={
+'식기세척기':'식사 뒤 설거지에 쓰는 시간을 덜어, 식탁의 즐거움이 뒷정리의 부담으로 이어지지 않도록 돕는 선택이에요.',
+'로봇청소기':'바닥 청소를 매번 직접 챙겨야 하는 부담을 줄여, 원하는 휴식이나 정돈된 공간을 유지하는 데 시간을 쓸 수 있어요.',
+'워시콤보':'세탁에서 건조로 이어지는 과정을 간소화해, 세탁 일정에 신경 쓰는 횟수를 줄이는 데 도움이 돼요.',
+'스타일러':'옷을 아껴 입고 바로 세탁하기 애매한 옷을 관리하는 습관과 연결되는 제품이에요.',
+'바스에어':'겨울철 욕실의 차가움이 신경 쓰인다는 선택과 직접 연결돼요. 온도와 습기를 고려해 쾌적하고 위생적인 욕실 환경을 꾸리는 데 어울려요.',
+'OLED TV':'영화와 드라마를 보는 시간이 중요한 휴식이라면, 집에서 콘텐츠에 몰입하는 경험을 풍성하게 하는 선택이에요.',
+'스탠바이미':'집에서 콘텐츠를 즐기되 한 자리에만 머물고 싶지 않을 때, 화면을 이동해 활용할 수 있는 선택이에요.',
+'STEM 얼음정수 냉장고':'시원한 음료를 자주 즐기거나 손님을 맞이하는 생활에서 음료 준비의 번거로움을 덜 수 있어요.',
+'김치냉장고':'식재료를 넉넉히 준비해 두는 생활에서 중요한 보관 공간과 관리 방식을 함께 고려한 선택이에요.',
+'드로어 냉장고':'자주 쓰는 재료를 구분해 보관하고 꺼내는 동선을 편리하게 구성하는 데 어울려요.',
+'인덕션':'직접 요리하는 즐거움을 중요하게 여기는 생활에서 조리와 주방 관리의 편리함을 고려한 선택이에요.',
+'광파오븐':'집에서 요리하는 즐거움을 다양한 조리 방식으로 넓혀보고 싶은 생활에 어울려요.'
+};
+return {basis:meaning||first[2],benefit:productReason[p]||life};
 }
 function listProducts(items,answers=[]){
-return '<div class="rec-list">'+items.map((p,i)=>{const note=recommendationNarrative(p,answers);return '<div class="rec"><b>'+(i+1)+'. '+esc(p)+'</b><div class="rec-evidence"><div class="rec-reason-label">추천 근거</div><p>'+esc(note.basis)+'</p><div class="rec-reason-label">우리 생활에 어울리는 이유</div><p>'+esc(note.benefit)+'</p></div></div>'}).join('')+'</div>';
+return '<div class="rec-list">'+items.map((p,i)=>{const note=recommendationNarrative(p,answers);return '<div class="rec"><b>'+(i+1)+'. '+esc(p)+'</b><div class="rec-evidence"><div class="rec-reason-label">이런 생활 가치관이 보여요</div><p>'+esc(note.basis)+'</p><div class="rec-reason-label">그래서 이 가전을 추천해요</div><p>'+esc(note.benefit)+'</p></div></div>'}).join('')+'</div>';
 }
 function needText(answers){
 let all=answers.flat();
