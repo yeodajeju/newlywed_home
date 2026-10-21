@@ -22,7 +22,7 @@ main{box-shadow:0 18px 70px #65463a14}
 .report-view .report-nav{margin-top:30px}
 .report-view .primary{min-height:54px;box-shadow:0 7px 16px #b76f6526}
 @media(max-width:420px){.report-view .card{padding:23px 19px}.report-view .rec-list .rec{padding:21px 18px}.report-view .card p{font-size:13.5px}.report-view .rec-list .rec-evidence p{font-size:13.5px}}
-.comparison-list{display:grid;gap:13px;margin:14px 0}.comparison-item{background:#fdf8f5;border:1px solid #f0e5df;border-radius:15px;padding:16px}.comparison-number{font:700 10px 'DM Sans',sans-serif;letter-spacing:1.5px;color:#b77b70;margin-bottom:8px}.comparison-question{font-weight:700;font-size:14px;line-height:1.65;margin-bottom:10px;word-break:keep-all}.comparison-shared{background:#fff;border-radius:9px;padding:11px 12px;color:#765b53;font-size:13px;line-height:1.65;word-break:keep-all}.comparison-pair{display:grid;grid-template-columns:1fr 1fr;gap:9px}.comparison-pair>div{background:#fff;border-radius:9px;padding:11px;min-width:0}.comparison-pair span{display:inline-block;color:#b57469;font-size:11px;font-weight:700;margin-bottom:5px}.report-view .comparison-pair p{font-size:12px;line-height:1.7;margin:0}.report-view .comparison-insight{border-top:1px solid #efe3dc;margin-top:17px;padding-top:16px;color:#655751;font-size:13.5px;line-height:1.9}.report-view .comparison-empty{font-size:13px;color:#877771}@media(max-width:360px){.comparison-pair{grid-template-columns:1fr}} </style></head><body><main><div id="app"></div></main><script>
+.comparison-list{display:grid;gap:13px;margin:14px 0}.comparison-item{background:#fdf8f5;border:1px solid #f0e5df;border-radius:15px;padding:16px}.comparison-number{font:700 10px 'DM Sans',sans-serif;letter-spacing:1.5px;color:#b77b70;margin-bottom:8px}.comparison-question{font-weight:700;font-size:14px;line-height:1.65;margin-bottom:10px;word-break:keep-all}.comparison-shared{background:#fff;border-radius:9px;padding:11px 12px;color:#765b53;font-size:13px;line-height:1.65;word-break:keep-all}.comparison-pair{display:grid;grid-template-columns:1fr 1fr;gap:9px}.comparison-pair>div{background:#fff;border-radius:9px;padding:11px;min-width:0}.comparison-pair span{display:inline-block;color:#b57469;font-size:11px;font-weight:700;margin-bottom:5px}.report-view .comparison-pair p{font-size:12px;line-height:1.7;margin:0}.report-view .comparison-insight{border-top:1px solid #efe3dc;margin-top:17px;padding-top:16px;color:#655751;font-size:13.5px;line-height:1.9}.report-view .comparison-empty{font-size:13px;color:#877771}@media(max-width:360px){.comparison-pair{grid-template-columns:1fr}} .report-view .closing-headline{font-weight:750;font-size:18px;line-height:1.6;letter-spacing:-.5px;color:#5c4540;margin:0 0 12px;word-break:keep-all} </style></head><body><main><div id="app"></div></main><script>
 const questions=[
 ['모처럼 아무 약속 없는 토요일!','집에서 밀린 드라마를 보며 푹 쉬고 싶어요','일단 나가고 싶어요! 재미있는 일을 찾아볼래요'],
 ['여행을 떠나기 전날 밤, 나는?','일정부터 준비물까지 미리 챙겨두는 편이에요','짐은 금방 싸요! 필요한 것만 챙기면 돼요'],
@@ -293,18 +293,30 @@ const different=keyDiff.length===2?
 keyDiff.length===1?'두 분 사이에서 눈에 띄는 차이는 '+keyDiff[0].tag+'이에요. '+keyDiff[0].detail+' 생활 속에서 이 차이가 드러나는 순간에 대비해 기준을 미리 맞춰보면 좋겠어요.':
 '핵심 생활 주제에서 서로 다른 선택이 거의 없어요. 지금은 갈등을 억지로 찾기보다, 같은 답변을 선택한 이유가 서로도 같은지 확인해 보는 편이 의미 있어요.';
 const first=keySame[0],second=keyDiff[0];
-const synthesis=first&&second?
-'이 부부의 특징은 '+first.tag+'에서는 기준이 같지만 '+second.tag+'에서는 접근이 다르다는 점이에요. '+first.detail+' 반면 '+second.detail+' 그래서 함께 정할 일은 공통 기준을 활용하고, 각자 다르게 느끼는 부분에는 선택의 여지를 남기는 방식이 어울려요.':
-first?'생활의 중심에는 '+first.tag+'에 대한 공통 기준이 있어요. '+first.detail+' 이 기준을 신혼집의 생활 방식과 가전 선택에도 적용해 보면 좋아요.':
-second?'가장 먼저 조율할 주제는 '+second.tag+'이에요. '+second.detail+' 신혼집을 꾸리기 전에 이 기준부터 맞추면 실제 생활에서의 시행착오를 줄일 수 있어요.':
-'이번 질문만으로 두 분의 관계를 단정하기는 어려워요. 생활에서 특히 중요하게 여기는 기준을 서로 이야기해 보는 것이 좋아요.';
+const closingIdeas={
+19:'함께하는 시간은 약속으로 지키고, 혼자만의 시간은 서로의 선택에 맡겨보세요.',
+10:'집안일의 완료 시점보다 서로가 편안해지는 시간을 먼저 정해보세요.',
+8:'집이 언제나 완벽해야 한다는 기준보다, 둘 다 편안하게 쉴 수 있는 최소한의 정리 기준을 정해보세요.',
+15:'큰 구매에서는 결정 날짜와 예산을 먼저 정하고, 그 안에서 충분히 비교할 시간을 확보해 보세요.',
+18:'돈을 아끼는 선택과 시간을 아끼는 선택 사이에 두 사람만의 우선순위를 만들어 보세요.',
+6:'집안일을 같은 방식으로 할 필요는 없어요. 담당과 마감 기준을 정하면 방식의 차이는 줄일 수 있어요.',
+0:'주말마다 같은 활동을 고집하지 말고, 집에서 쉬는 날과 밖에서 보내는 날을 번갈아 계획해 보세요.',
+5:'식사 메뉴보다 준비와 정리에 쓰는 시간을 어떻게 나눌지부터 이야기해 보세요.',
+3:'장보기 방식이 다르다면 기본 식재료만 함께 정하고 나머지는 각자의 선택에 맡겨보세요.',
+16:'가전 선택에서는 꼭 필요한 기능과 포기할 수 없는 디자인 조건을 각각 하나씩 골라보세요.',
+2:'손님을 초대하는 날과 둘만 쉬는 날을 구분하면 집이 두 사람 모두에게 편안한 공간이 될 수 있어요.',
+17:'여가 시간은 같은 활동을 해야만 함께하는 시간이 되는 건 아니에요. 각자의 즐거움을 존중해 보세요.'
+};
+const closingTitle=first&&second?'닮은 기준은 함께, 다른 리듬은 유연하게':first?'함께 지킬 기준이 분명한 부부':second?'같은 집, 서로 다른 편안함의 방식':'우리만의 생활 기준을 찾아가는 부부';
+const closingBody=second?(closingIdeas[second.q]||'서로 다른 선택이 반복되는 순간을 찾아 작은 약속부터 만들어 보세요.')+(first?' 두 분이 이미 공감하는 '+first.tag+'의 기준은 이 약속을 지켜나가는 데 좋은 출발점이 될 수 있어요.':' 각자의 방식이 존중받는다는 느낌이 중요해요.'):first?'두 분이 공감하는 '+first.tag+'의 기준을 신혼집의 우선순위로 삼아보세요. 다만 같은 답을 선택했더라도 그 이유는 서로 확인해 보는 게 좋아요.':'이번 답변만으로 하나의 결론을 단정하기는 어려워요. 생활에서 꼭 지키고 싶은 기준을 각자 하나씩 이야기해 보세요.';
+const synthesis=closingTitle+'|'+closingBody;
 return {common,different,synthesis,same,diff};
 }
 function reportPage(n){
 let r=coupleAnalyze(),a=state.answers[0],b=state.answers[1],who=n===1?0:1,ind=who===0?r.x:r.y,profile=lifestyle[ind.primary],sub=lifestyle[ind.secondary];
 if(n===0){
 let story=deepCoupleStory(r,a,b);
-return '<div class="eyebrow">OUR NEWLYWED STORY · 01 / 03</div><div class="type-hero">'+titleIcon(r.type[1])+'<h2>'+r.type[0]+'</h2><p>'+r.type[2]+'</p></div><div class="card"><h3>💞 우리가 같은 선택을 한 질문</h3>'+compareCards(story.same,true)+'<p class="comparison-insight">'+esc(story.common)+'</p></div><div class="card"><h3>🌙 우리가 다르게 선택한 질문</h3>'+compareCards(story.diff,false)+'<p class="comparison-insight">'+esc(story.different)+'</p></div><div class="card"><h3>🌿 우리 부부의 생활 해석</h3><p>'+esc(story.synthesis)+'</p></div><h3>우리에게 딱 맞는 신혼 라이프를 위한 추천 가전</h3>'+listProducts(r.both,[a,b]);
+return '<div class="eyebrow">OUR NEWLYWED STORY · 01 / 03</div><div class="type-hero">'+titleIcon(r.type[1])+'<h2>'+r.type[0]+'</h2><p>'+r.type[2]+'</p></div><div class="card"><h3>💞 우리가 같은 선택을 한 질문</h3>'+compareCards(story.same,true)+'<p class="comparison-insight">'+esc(story.common)+'</p></div><div class="card"><h3>🌙 우리가 다르게 선택한 질문</h3>'+compareCards(story.diff,false)+'<p class="comparison-insight">'+esc(story.different)+'</p></div><div class="card"><h3>🌿 우리 부부의 생활 해석</h3><div class="closing-headline">'+esc(story.synthesis.split('|')[0])+'</div><p>'+esc(story.synthesis.split('|')[1])+'</p></div><h3>우리에게 딱 맞는 신혼 라이프를 위한 추천 가전</h3>'+listProducts(r.both,[a,b]);
 }
 return '<div class="eyebrow">OUR NEWLYWED STORY · 0'+(n+1)+' / 03</div><div class="type-hero">'+titleIcon(profile[2])+'<h2>'+esc(state.names[who])+'님은<br>'+profile[1]+' '+profile[0]+'이에요</h2><p>'+profile[3]+'</p></div><div class="card"><h3>🌿 선택 속에 담긴 생활의 기준</h3><p>'+individualInsight(ind)+'</p></div><div class="card"><h3>✨ 함께 드러난 또 하나의 기준</h3><p>'+secondaryInsight(ind)+'</p></div><h3>'+esc(state.names[who])+'님을 위한 추천 가전</h3>'+listProducts(ind.appliances,[state.answers[who]]);
 }
