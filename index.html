@@ -185,28 +185,35 @@ function productFit(p,ans){
  return {direct,necessity,values,taste};
 }
 function personalPicks(ans,shared=[],other=[]){
- return selectDiverse(products.map(p=>{
-  const x=productFit(p,ans);
-  if(!x.direct||shared.includes(p))return {p,value:-100};
-  const y=other.length===20?productFit(p,other):null;
+ // 개인 추천은 공통 제품을 제외하고, 직접 근거가 있는 제품을 먼저 고릅니다.
+ // 충분하지 않으면 관련 생활 습관이 확인된 제품으로만 보완합니다.
+ const scored=products.filter(p=>!shared.includes(p)).map(p=>{
+  const x=productFit(p,ans),y=other.length===20?productFit(p,other):null;
   const individuality=y?Math.max(0,x.necessity-y.necessity)*1.5:0;
-  return {p,value:10*(.55*x.necessity+.30*x.values+.15*x.taste)+individuality};
- }));
+  const supporting=productSignal(p,ans).evidence;
+  const eligible=x.direct||(supporting>=2&&x.necessity>=.15);
+  return {p,value:eligible?10*(.55*x.necessity+.30*x.values+.15*x.taste)+individuality+(x.direct?2:0):-100};
+ });
+ return selectDiverse(scored);
 }
 function sharedPicks(a,b){
- return selectDiverse(products.map(p=>{
+ const scored=products.map(p=>{
   const x=productFit(p,a),y=productFit(p,b);
-  // 두 사람 모두 같은 제품을 원할 필요는 없지만, 적어도 한 사람에게 명확한 필요가 있어야 합니다.
   if(!x.direct&&!y.direct)return {p,value:-100};
-  const joint=x.direct&&y.direct?1:sharedUtility.has(p)?.72:
-    // 개인 취향 제품은 다른 배우자의 연관 선택이 있을 때만 공동 추천합니다.
+  const both=x.direct&&y.direct;
+  const joint=both?1:sharedUtility.has(p)?.72:
     (Math.max(x.necessity,y.necessity)>.7&&Math.min(x.necessity,y.necessity)>.18?.5:0);
   if(joint===0)return {p,value:-100};
   const need=Math.max(x.necessity,y.necessity)*.65+Math.min(x.necessity,y.necessity)*.35;
-  const values=(x.values+y.values)/2;
-  const taste=(x.taste+y.taste)/2;
-  return {p,value:10*(.40*need+.25*values+.25*joint+.10*taste)};
- }));
+  const values=(x.values+y.values)/2,taste=(x.taste+y.taste)/2;
+  // 두 사람에게 모두 직접 근거가 있는 제품은 공통 추천에서 우선합니다.
+  return {p,value:10*(.40*need+.25*values+.25*joint+.10*taste)+(both?5:0)};
+ });
+ const bothMatches=scored.filter(z=>productFit(z.p,a).direct&&productFit(z.p,b).direct&&z.value>0)
+  .sort((x,y)=>y.value-x.value);
+ const result=selectDiverse(bothMatches,3);
+ const rest=selectDiverse(scored.filter(z=>!result.includes(z.p)),3-result.length);
+ return result.concat(rest);
 }
 function individual(a){
 const scores=traits.map((items,t)=>{let sum=0,max=0;items.forEach(([q,w],j)=>{max+=w;if(a[q]===traitChoices[t][j])sum+=w});return sum/max});
@@ -456,7 +463,7 @@ const params=new URLSearchParams(location.search);
 if(params.get('preview')!=='1')return;
 const scenario=params.get('case')||'balanced';
 const patterns={
-balanced:[[0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0],[1,0,1,1,1,1,1,1,1,1,0,1,1,1,1,0,1,1,1,1]],
+balanced:[[0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0],[1,0,1,1,1,0,1,1,1,1,0,1,1,1,1,0,1,1,0,1]],
 similar:[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]],
 different:[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]]
 };
