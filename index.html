@@ -657,7 +657,7 @@ reportPage=function(n){
  const coupleProducts=r.both.filter(p=>recommendationNarrative(p,[a,b]));
  const groomProducts=rankedCandidates(a,null,coupleProducts).filter(p=>recommendationNarrative(p,[a])).slice(0,2);
  const personalProducts=who===0?groomProducts:rankedCandidates(b,null,[...coupleProducts,...groomProducts]).filter(p=>recommendationNarrative(p,[b])).slice(0,2);
- return '<div class="eyebrow">OUR NEWLYWED STORY · 0'+(n+1)+' / 03</div><div class="type-hero">'+titleIcon(profile[2])+'<h2>'+esc(state.names[who])+'님은<br>'+profile[1]+' '+profile[0]+'이에요</h2><p>'+profile[3]+'</p></div><div class="card"><h3>🌿 선택 속에 담긴 생활의 기준</h3><p>'+esc(story.first)+'</p></div><div class="card"><h3>✨ 함께 드러난 또 하나의 기준</h3><p>'+esc(story.second)+'</p></div><h3>'+esc(state.names[who])+'님만의 취향을 반영한 추가 가전 추천</h3>'+(personalProducts.length?listProducts(personalProducts,[state.answers[who]]):'<p>추천 근거가 충분한 제품이 없어 이번에는 생활 성향 분석에 집중했어요.</p>');
+ return '<div class="eyebrow">OUR NEWLYWED STORY · 0'+(n+1)+' / 03</div><div class="type-hero">'+titleIcon(profile[2])+'<h2>'+esc(state.names[who])+'님은<br>'+profile[1]+' '+profile[0]+'이에요</h2><p>'+profile[3]+'</p></div><div class="card"><h3>🌿 선택 속에 담긴 생활의 기준</h3><p>'+esc(story.first)+'</p></div><div class="card"><h3>✨ '+esc(state.names[who])+'님은 이런 생활을 꿈꿔요</h3><p>'+esc(story.second)+'</p></div><h3>'+esc(state.names[who])+'님만의 취향을 반영한 추가 가전 추천</h3>'+(personalProducts.length?listProducts(personalProducts,[state.answers[who]]):'<p>추천 근거가 충분한 제품이 없어 이번에는 생활 성향 분석에 집중했어요.</p>');
 };
 oldRender=function(){
  let h='';
