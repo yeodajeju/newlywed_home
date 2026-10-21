@@ -185,16 +185,17 @@ function productFit(p,ans){
  return {direct,necessity,values,taste};
 }
 function personalPicks(ans,shared=[],other=[]){
- // 개인 추천은 공통 제품을 제외하고, 직접 근거가 있는 제품을 먼저 고릅니다.
- // 충분하지 않으면 관련 생활 습관이 확인된 제품으로만 보완합니다.
- const scored=products.filter(p=>!shared.includes(p)).map(p=>{
-  const x=productFit(p,ans),y=other.length===20?productFit(p,other):null;
-  const individuality=y?Math.max(0,x.necessity-y.necessity)*1.5:0;
-  const supporting=productSignal(p,ans).evidence;
-  const eligible=x.direct||(supporting>=2&&x.necessity>=.15);
-  return {p,value:eligible?10*(.55*x.necessity+.30*x.values+.15*x.taste)+individuality+(x.direct?2:0):-100};
+ const scored=products.map(p=>{
+  const x=productFit(p,ans),signal=productSignal(p,ans);
+  const y=other.length===20?productFit(p,other):null;
+  const eligible=x.direct||(signal.evidence>=2&&x.necessity>=.15);
+  const personalDifference=y?Math.max(0,x.necessity-y.necessity):0;
+  const preference=ans[16]===0&&essentialProducts.has(p)?.8:0;
+  const score=10*(.55*x.necessity+.30*x.values+.15*x.taste)+personalDifference*2+preference+(x.direct?2:0);
+  return {p,value:eligible?score:-100};
  });
- return selectDiverse(scored);
+ // 부부 추천과 중복 가능. 다만 개인적 필요가 강한 제품부터 2개만.
+ return selectDiverse(scored,2);
 }
 function sharedPicks(a,b){
  const scored=products.map(p=>{
@@ -203,17 +204,17 @@ function sharedPicks(a,b){
   const both=x.direct&&y.direct;
   const joint=both?1:sharedUtility.has(p)?.72:
     (Math.max(x.necessity,y.necessity)>.7&&Math.min(x.necessity,y.necessity)>.18?.5:0);
-  if(joint===0)return {p,value:-100};
+  if(!joint)return {p,value:-100};
   const need=Math.max(x.necessity,y.necessity)*.65+Math.min(x.necessity,y.necessity)*.35;
   const values=(x.values+y.values)/2,taste=(x.taste+y.taste)/2;
-  // 두 사람에게 모두 직접 근거가 있는 제품은 공통 추천에서 우선합니다.
   return {p,value:10*(.40*need+.25*values+.25*joint+.10*taste)+(both?5:0)};
  });
- const bothMatches=scored.filter(z=>productFit(z.p,a).direct&&productFit(z.p,b).direct&&z.value>0)
+ // 두 사람이 모두 개인적으로 추천받을 만한 제품은 공통 추천에서도 우선 고려.
+ const firstA=new Set(personalPicks(a,[],b)),firstB=new Set(personalPicks(b,[],a));
+ const overlap=scored.filter(z=>firstA.has(z.p)&&firstB.has(z.p)&&z.value>0)
   .sort((x,y)=>y.value-x.value);
- const result=selectDiverse(bothMatches,3);
- const rest=selectDiverse(scored.filter(z=>!result.includes(z.p)),3-result.length);
- return result.concat(rest);
+ const chosen=selectDiverse(overlap,3);
+ return chosen.concat(selectDiverse(scored.filter(z=>!chosen.includes(z.p)),3-chosen.length));
 }
 function individual(a){
 const scores=traits.map((items,t)=>{let sum=0,max=0;items.forEach(([q,w],j)=>{max+=w;if(a[q]===traitChoices[t][j])sum+=w});return sum/max});
@@ -286,7 +287,7 @@ function recommendationNarrative(p,answers){
  const g=directProductMatch(p,a),h=shared&&directProductMatch(p,b);
  const opening=''; // 추천 카드에는 반복적인 공통 도입문을 넣지 않습니다.
  const reason={
- 'STEM 얼음정수 냉장고':'아이스 음료를 즐긴다는 선택을 바탕으로, 얼음과 물을 따로 준비하는 번거로움을 줄일 수 있어요. 손님 초대 여부만으로 추천한 제품은 아니에요.',
+ 'STEM 얼음정수 냉장고':'아이스 음료를 즐긴다는 선택을 바탕으로, 얼음과 물을 따로 준비하는 번거로움을 줄일 수 있어요. ',
  '바스에어':'겨울철 욕실의 차가움이 신경 쓰인다는 선택과 연결돼요. 샤워 전후 온도와 습기를 관리해 보다 쾌적하고 위생적인 욕실 환경을 만드는 데 어울려요.',
  '식기세척기':'식사 후 반복되는 설거지 부담을 줄여, 함께 먹는 즐거움 뒤에도 여유를 남길 수 있어요.',
  '로봇청소기':'바닥 청소에 쓰는 시간과 수고를 덜어, 정돈된 집과 쉬는 시간을 함께 챙기는 데 도움이 돼요.',
@@ -412,7 +413,7 @@ function reportPage(n){
 let r=coupleAnalyze(),a=state.answers[0],b=state.answers[1],who=n===1?0:1,ind=who===0?r.x:r.y,profile=lifestyle[ind.primary],sub=lifestyle[ind.secondary];
 if(n===0){
 let story=deepCoupleStory(r,a,b);
-return '<div class="eyebrow">OUR NEWLYWED STORY · 01 / 03</div><div class="type-hero">'+titleIcon(r.type[1])+'<h2>'+r.type[0]+'</h2><p>'+r.type[2]+'</p></div><div class="card"><h3>💞 우리가 같은 선택을 한 질문</h3>'+compareCards(story.same,true)+'<p class="comparison-insight">'+esc(story.common)+'</p></div><div class="card"><h3>🌙 우리가 다르게 선택한 질문</h3>'+compareCards(story.diff,false)+'<p class="comparison-insight">'+esc(story.different)+'</p></div><div class="card"><h3>🌿 우리 부부의 생활 해석</h3><div class="closing-headline">'+esc(story.synthesis.split('|')[0])+'</div><p>'+esc(story.synthesis.split('|')[1])+'</p></div><h3>우리에게 딱 맞는 신혼 라이프를 위한 추천 가전</h3>'+listProducts(r.both,[a,b]);
+return '<div class="eyebrow">OUR NEWLYWED STORY · 01 / 03</div><div class="type-hero">'+titleIcon(r.type[1])+'<h2>'+r.type[0]+'</h2><p>'+r.type[2]+'</p></div><div class="card"><h3>💞 우리가 같은 선택을 한 질문</h3>'+compareCards(story.same,true)+'<p class="comparison-insight">'+esc(story.common)+'</p></div><div class="card"><h3>🌙 우리가 다르게 선택한 질문</h3>'+compareCards(story.diff,false)+'<p class="comparison-insight">'+esc(story.different)+'</p></div><div class="card"><h3>🌿 우리 부부의 생활 해석</h3><div class="closing-headline">'+esc(story.synthesis.split('|')[0])+'</div><p>'+esc(story.synthesis.split('|')[1])+'</p></div><h3>우리에게 딱 맞는 신혼 라이프를 위한 두 분의 라이프스타일에 어울리는 가전 3가지</h3>'+listProducts(r.both,[a,b]);
 }
 return '<div class="eyebrow">OUR NEWLYWED STORY · 0'+(n+1)+' / 03</div><div class="type-hero">'+titleIcon(profile[2])+'<h2>'+esc(state.names[who])+'님은<br>'+profile[1]+' '+profile[0]+'이에요</h2><p>'+profile[3]+'</p></div><div class="card"><h3>🌿 선택 속에 담긴 생활의 기준</h3><p>'+individualInsight(ind,state.answers[who])+'</p></div><div class="card"><h3>✨ 함께 드러난 또 하나의 기준</h3><p>'+secondaryInsight(ind,state.answers[who])+'</p></div><h3>'+esc(state.names[who])+'님을 위한 추천 가전</h3>'+listProducts(ind.appliances,[state.answers[who]]);
 }
