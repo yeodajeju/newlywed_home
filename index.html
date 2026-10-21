@@ -409,7 +409,7 @@ if(n===0){
 let story=deepCoupleStory(r,a,b);
 return '<div class="eyebrow">OUR NEWLYWED STORY · 01 / 03</div><div class="type-hero">'+titleIcon(r.type[1])+'<h2>'+r.type[0]+'</h2><p>'+r.type[2]+'</p></div><div class="card"><h3>💞 우리가 같은 선택을 한 질문</h3>'+compareCards(story.same,true)+'<p class="comparison-insight">'+esc(story.common)+'</p></div><div class="card"><h3>🌙 우리가 다르게 선택한 질문</h3>'+compareCards(story.diff,false)+'<p class="comparison-insight">'+esc(story.different)+'</p></div><div class="card"><h3>🌿 우리 부부의 핵심 특징과 총평</h3><div class="closing-headline">'+esc(story.synthesis.split('|')[0])+'</div><p>'+esc(story.synthesis.split('|')[1])+'</p></div><div class="card"><h3>💡 함께 살아가기 위한 생활 조언</h3><p>'+esc(story.advice)+'</p></div><h3>두 분의 라이프스타일에 어울리는 가전 3가지</h3>'+listProducts(r.both,[a,b]);
 }
-return '<div class="eyebrow">OUR NEWLYWED STORY · 0'+(n+1)+' / 03</div><div class="type-hero">'+titleIcon(profile[2])+'<h2>'+esc(state.names[who])+'님은<br>'+profile[1]+' '+profile[0]+'이에요</h2><p>'+profile[3]+'</p></div><div class="card"><h3>🌿 선택 속에 담긴 생활의 기준</h3><p>'+individualInsight(ind,state.answers[who])+'</p></div><div class="card"><h3>✨ 함께 드러난 또 하나의 기준</h3><p>'+secondaryInsight(ind,state.answers[who])+'</p></div><h3>'+esc(state.names[who])+'님만의 취향을 반영한 가전 추천 2가지</h3>'+listProducts(ind.appliances,[state.answers[who]]);
+return '<div class="eyebrow">OUR NEWLYWED STORY · 0'+(n+1)+' / 03</div><div class="type-hero">'+titleIcon(profile[2])+'<h2>'+esc(state.names[who])+'님은<br>'+profile[1]+' '+profile[0]+'이에요</h2><p>'+profile[3]+'</p></div><div class="card"><h3>🌿 선택 속에 담긴 생활의 기준</h3><p>'+individualInsight(ind,state.answers[who])+'</p></div><div class="card"><h3>✨ '+"'+esc(state.names[who])+'"+'님은 이런 생활을 꿈꿔요</h3><p>'+secondaryInsight(ind,state.answers[who])+'</p></div><h3>'+esc(state.names[who])+'님만의 취향을 반영한 가전 추천 2가지</h3>'+listProducts(ind.appliances,[state.answers[who]]);
 }
 let reportIndex=0;
 function showReport(n){reportIndex=n;state.page='report';render();window.scrollTo(0,0)}
@@ -516,8 +516,8 @@ individual=function(ans){
  const order=scores.map((v,i)=>i).sort((a,b)=>scores[b]-scores[a]||a-b);
  return {primary:order[0],secondary:order[1],scores,appliances:personalPicks(ans)};
 };
-function rankedCandidates(a,b=null){
- const all=products.map(p=>{
+function rankedCandidates(a,b=null,excluded=[]){
+ const all=products.filter(p=>!excluded.includes(p)).map(p=>{
   const rules=recWeights[p]||[];
   const val=x=>rules.reduce((n,[q,v,w])=>n+(x[q]===v?w:0),0);
   const x=val(a),y=b?val(b):0,raw=b?x*.55+y*.55+(x>0&&y>0?2:0):x;
@@ -654,7 +654,10 @@ reportPage=function(n){
   return '<div class="eyebrow">OUR NEWLYWED STORY · 01 / 03</div><div class="type-hero">'+titleIcon(r.type[1])+'<h2>'+esc(r.type[0])+'</h2><p>'+esc(r.type[2])+'</p></div><div class="card"><h3>💞 우리가 같은 선택을 한 질문</h3>'+compareCards(story.same,true)+'<p class="comparison-insight">'+esc(story.common)+'</p></div><div class="card"><h3>🌙 우리가 다르게 선택한 질문</h3>'+compareCards(story.diff,false)+'<p class="comparison-insight">'+esc(story.different)+'</p></div><div class="card"><h3>🌿 우리 부부의 핵심 특징과 총평</h3><div class="closing-headline">'+esc(story.synthesis.split('|')[0])+'</div><p>'+esc(story.synthesis.split('|')[1])+'</p><div class="key-advice"><span class="key-advice-label">우리 부부에게 필요한 한마디</span><strong>'+esc(story.takeaway)+'</strong></div></div><h3>두 분의 라이프스타일에 어울리는 가전</h3>'+(r.both.length?listProducts(r.both,[a,b]):'<p>이번 응답만으로 충분한 추천 근거가 확인되지 않았어요. 실제 생활에서 필요한 가전을 함께 살펴보세요.</p>');
  }
  const who=n===1?0:1,ind=who===0?r.x:r.y,profile=lifestyle[ind.primary],sub=lifestyle[ind.secondary],story=personalDeep(ind,state.answers[who]);
- return '<div class="eyebrow">OUR NEWLYWED STORY · 0'+(n+1)+' / 03</div><div class="type-hero">'+titleIcon(profile[2])+'<h2>'+esc(state.names[who])+'님은<br>'+profile[1]+' '+profile[0]+'이에요</h2><p>'+profile[3]+'</p></div><div class="card"><h3>🌿 선택 속에 담긴 생활의 기준</h3><p>'+esc(story.first)+'</p></div><div class="card"><h3>✨ 함께 드러난 또 하나의 기준</h3><p>'+esc(story.second)+'</p></div><h3>'+esc(state.names[who])+'님만의 취향을 반영한 추가 가전 추천</h3>'+(ind.appliances.length?listProducts(ind.appliances,[state.answers[who]]):'<p>추천 근거가 충분한 제품이 없어 이번에는 생활 성향 분석에 집중했어요.</p>');
+ const coupleProducts=r.both.filter(p=>recommendationNarrative(p,[a,b]));
+ const groomProducts=rankedCandidates(a,null,coupleProducts).filter(p=>recommendationNarrative(p,[a])).slice(0,2);
+ const personalProducts=who===0?groomProducts:rankedCandidates(b,null,[...coupleProducts,...groomProducts]).filter(p=>recommendationNarrative(p,[b])).slice(0,2);
+ return '<div class="eyebrow">OUR NEWLYWED STORY · 0'+(n+1)+' / 03</div><div class="type-hero">'+titleIcon(profile[2])+'<h2>'+esc(state.names[who])+'님은<br>'+profile[1]+' '+profile[0]+'이에요</h2><p>'+profile[3]+'</p></div><div class="card"><h3>🌿 선택 속에 담긴 생활의 기준</h3><p>'+esc(story.first)+'</p></div><div class="card"><h3>✨ 함께 드러난 또 하나의 기준</h3><p>'+esc(story.second)+'</p></div><h3>'+esc(state.names[who])+'님만의 취향을 반영한 추가 가전 추천</h3>'+(personalProducts.length?listProducts(personalProducts,[state.answers[who]]):'<p>추천 근거가 충분한 제품이 없어 이번에는 생활 성향 분석에 집중했어요.</p>');
 };
 oldRender=function(){
  let h='';
