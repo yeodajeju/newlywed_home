@@ -439,7 +439,7 @@ entrySending=true;button.disabled=true;button.textContent='응모 정보를 전�
 try{
 await fetch(ENTRY_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
 status.textContent='제출이 완료되었습니다.';
-button.textContent='결과 보기';button.disabled=false;button.onclick=()=>showReport(1);
+button.textContent='결과 보기';button.disabled=false;button.onclick=()=>showReport(0);
 }catch(e){
 status.textContent='전송 요청이 실패했어요. 인터넷 연결을 확인하고 다시 시도해 주세요.';
 button.textContent='다시 전송하기';button.disabled=false;
