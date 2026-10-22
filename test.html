@@ -738,23 +738,56 @@ function interpretedPersonal(ind,ans){
 coupleDeep=interpretedStory;
 personalDeep=interpretedPersonal;
 
-/* 결과 순서: 신랑 → 신부 → 부부 총평 */
-const resultContentByIndex=reportPage;
+/* 실험용 4단계 리포트: 개인 분석 → 개인 분석 → 부부 총평 → 공통 가전 */
+const originalResultContent=reportPage;
+function personalExtra(who){
+ const a=state.answers[who],name=esc(state.names[who]);
+ const scene=a[2]===0
+  ?(a[12]===0?'피곤한 날에도 집이 어질러져 있으면 마음이 쓰일 수 있어요. 쉬고 싶은 마음과 정리하고 싶은 마음이 동시에 생기는 모습이에요.':'하루가 고단할 때는 집이 조금 어질러져 있어도 휴식을 먼저 택하는 편이에요. 편안함의 기준이 꼭 완벽한 정리는 아닌 거죠.')
+  :(a[12]===0?'할 일을 끝내야 편히 쉬는 편이고, 주변도 정돈되어 있을 때 더 마음이 놓일 수 있어요.':'해야 할 일을 마치고 쉬고 싶지만, 집안의 모든 것을 완벽하게 정리해야 한다고 생각하지는 않을 수 있어요.');
+ const twist=a[22]===0&&a[15]===1?'중요한 일정은 미리 준비하면서도 마음에 드는 물건은 빠르게 결정할 수 있어요. 계획적인 모습과 과감한 선택이 함께 보이네요.':
+ a[22]===1&&a[15]===0?'일정은 유연하게 조정해도 물건을 살 때는 여러 선택지를 비교하는 편이에요. 모든 일에 즉흥적인 사람은 아니에요.':
+ a[9]===0&&a[24]===1?'둘이 함께하는 시간을 좋아하면서도 취향이 다를 때는 각자의 선택을 존중해요. 가까이 지내는 것과 똑같이 선택하는 것은 별개인 거죠.':
+ a[9]===1&&a[24]===0?'혼자만의 시간도 필요하지만 함께 결정할 때는 두 사람 모두 만족하는 답을 찾고 싶어 해요. 독립적인 면과 협력적인 면이 공존해요.':
+ '하나의 성향으로 모든 행동을 설명할 수는 없어요. 상황에 따라 다른 기준을 선택하는 것도 '+name+'님만의 생활 방식이에요.';
+ const partner=a[2]===0?'쉬고 싶다는 말이 집안일을 전혀 하지 않겠다는 뜻은 아닐 수 있어요. 잠깐 충전한 뒤 움직이는 방식이 더 편할 수 있겠어요.':
+ '남은 일을 먼저 끝내려는 모습은 상대를 재촉하려는 의도라기보다, 일을 마친 뒤 편하게 쉬고 싶은 생활 습관일 수 있어요.';
+ return '<div class="card"><h3>🏡 일상에서 드러나는 나의 모습</h3><p>'+esc(scene)+'</p></div>'+
+ '<div class="card"><h3>✨ 상대방도 몰랐던 나의 의외의 모습</h3><p>'+esc(twist)+'</p></div>'+
+ '<div class="card"><h3>💌 상대방이 알아두면 좋은 점</h3><p>'+esc(partner)+'</p></div>';
+}
 reportPage=function(step){
- const content=resultContentByIndex(step===0?1:step===1?2:0);
- return content.replace(/OUR NEWLYWED STORY · 0[1-3] \/ 03/,'OUR NEWLYWED STORY · 0'+(step+1)+' / 03');
-};
-const renderBeforeResultOrder=render;
-render=function(){
- renderBeforeResultOrder();
- if(state.page==='report'){
-  const nav=app.querySelector('.report-nav');
-  if(nav)nav.innerHTML=
-   (reportIndex>0?btn('이전 결과 보기','showReport('+(reportIndex-1)+')','secondary'):'')+
-   (reportIndex===0?btn('신부님 라이프스타일 보기 →','showReport(1)'):
-    reportIndex===1?btn('우리 부부 총평 보기 →','showReport(2)'):
-    btn('처음부터 다시 하기','location.reload()'));
+ if(step===0||step===1){
+  const who=step;
+  let html=originalResultContent(who===0?1:2);
+  const cut=html.indexOf('<h3>'+esc(state.names[who])+'님만의 취향을 반영한 추가 가전 추천</h3>');
+  if(cut>=0)html=html.slice(0,cut);
+  html=html.replace(/OUR NEWLYWED STORY · 0[1-3] \/ 03/,'OUR NEWLYWED STORY · 0'+(step+1)+' / 04');
+  return html+personalExtra(who);
  }
+ const r=coupleAnalyze(),a=state.answers[0],b=state.answers[1];
+ if(step===2){
+  let html=originalResultContent(0);
+  const cut=html.indexOf('<h3>두 분의 라이프스타일에 어울리는 가전</h3>');
+  if(cut>=0)html=html.slice(0,cut);
+  return html.replace(/OUR NEWLYWED STORY · 01 \/ 03/,'OUR NEWLYWED STORY · 03 / 04');
+ }
+ const picks=r.both.filter(p=>recommendationNarrative(p,[a,b])).slice(0,3);
+ return '<div class="eyebrow">OUR NEWLYWED STORY · 04 / 04</div><div class="type-hero"><h2>우리 부부에게 어울리는 가전</h2><p>두 사람의 생활 이야기를 바탕으로, 함께 쓸 때 도움이 될 만한 제품을 골랐어요.</p></div>'+
+ (picks.length?'<h3 class="result-section-title">우리 부부의 생활에 어울리는 추천 '+picks.length+'가지</h3>'+listProducts(picks,[a,b]):'<div class="card"><p>이번 응답만으로 추천 근거가 충분한 제품은 없었어요. 실제 생활에서 필요한 부분부터 함께 살펴보세요.</p></div>')+
+ '<p class="small">응답을 바탕으로 한 생활 제안이며, 구매를 전제로 하지 않아요.</p>';
+};
+const originalFourStepRender=render;
+render=function(){
+ originalFourStepRender();
+ if(state.page!=='report')return;
+ const nav=app.querySelector('.report-nav');
+ if(!nav)return;
+ nav.innerHTML=(reportIndex>0?btn('이전 결과 보기','showReport('+(reportIndex-1)+')','secondary'):'')+
+ (reportIndex===0?btn('신부님 분석 보기 →','showReport(1)'):
+ reportIndex===1?btn('우리 부부 총평 보기 →','showReport(2)'):
+ reportIndex===2?btn('우리 부부 추천 가전 보기 →','showReport(3)'):
+ btn('처음부터 다시 하기','location.reload()'));
 };
 loadPreviewFromUrl();
 render();
