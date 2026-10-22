@@ -840,7 +840,16 @@ function partnerPortrait(a){
  return first+' '+second;
 }
 individualInsight=function(ind,a){return dailyPortrait(a)};
-secondaryInsight=function(ind,a){return choiceContrast(a)};
+secondaryInsight=function(ind,a){
+ const use=a[13]===0,comfort=a[17]===0,care=a[16]===0;
+ const daily=use?
+  (comfort?'반복되는 일은 편리한 방법으로 해결하고 싶지만, 추운 아침에는 따뜻한 물이 나올 때까지 기다릴 만큼 몸이 느끼는 편안함도 챙겨요. 효율만큼 쾌적함을 중요하게 여기는 모습이에요.':'반복되는 번거로움은 줄이고 싶고, 추운 아침에도 빠르게 씻고 나오는 쪽을 선택했어요. 생활 속에서 시간을 아끼는 방식이 여러 장면에서 나타나요.'):
+  (comfort?'익숙한 방식이라면 조금 번거로워도 괜찮지만, 추운 아침의 따뜻함은 놓치고 싶지 않아요. 새로운 방법을 무조건 찾기보다 자신에게 중요한 편안함이 무엇인지 알고 있는 편이에요.':'익숙한 방법은 조금 번거로워도 괜찮고, 추운 아침에도 빠르게 씻고 나오는 편이에요. 사소한 불편보다 평소 익숙한 생활 리듬을 지키는 데 만족을 느낄 수 있어요.');
+ const clothing=care?
+  (a[15]===0?'옷은 한 번 입었다고 바로 세탁하기보다 상태를 살펴 다시 활용하는 편이에요. 물건을 관리할 때도 필요와 상태를 구분해서 판단하는 실용적인 면이 보여요.':'한 번 입은 옷은 세탁하는 편이에요. 생활 도구를 오래 쓰는 것보다 매일의 청결한 느낌을 더 중요하게 여기는 순간이 있을 수 있어요.'):
+  (a[15]===0?'욕실 용품은 상태를 보고 더 사용하면서, 옷도 한 번 입었다고 무조건 세탁하지는 않아요. 정해진 주기보다 실제 상태를 살펴 판단하는 생활 방식이 나타나요.':'욕실 용품은 상태를 보고 사용하지만 옷은 한 번 입으면 세탁하는 편이에요. 같은 위생 관리라도 물건의 종류에 따라 기준이 달라지는 모습이에요.');
+ return daily+' '+clothing;
+};
 personalExtra=function(who){
  const a=state.answers[who],home=a[12]===0,role=a[23]===0;
  const house=home?
