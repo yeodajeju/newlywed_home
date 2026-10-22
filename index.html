@@ -282,7 +282,7 @@ const recommendationAngles={
 };
 const applianceStory={"바스에어":"욕실도 단순히 씻는 공간을 넘어 온도와 쾌적함까지 신경 쓰고 싶은 생활이 보여요. 바스에어는 추운 날 욕실 온도와 샤워 후 습기 관리에 도움을 주어, 보다 쾌적하고 위생적인 욕실 환경을 만드는 데 어울려요.","식기세척기":"식사를 즐기는 시간만큼 식사 후 여유도 중요하겠어요. 식기세척기는 설거지에 드는 시간과 에너지를 줄여, 즐거운 한 끼가 뒷정리의 부담으로 이어지지 않도록 도와줘요.","로봇청소기":"집에서 쉬는 시간을 청소에 모두 쓰고 싶지는 않을 거예요. 로봇청소기는 반복되는 바닥 청소의 수고를 덜어, 집을 관리하는 부담과 휴식 사이의 균형을 맞추는 데 도움이 돼요.","워시콤보":"세탁을 여러 단계로 챙기는 일이 번거롭게 느껴질 수 있어요. 워시콤보는 세탁부터 건조까지 이어지는 과정을 간소화해, 빨래에 신경 쓰는 횟수를 줄이는 데 도움을 줘요.","스타일러":"좋아하는 옷을 오래 입으면서도 매번 세탁하는 부담은 줄이고 싶은 생활에 어울려요. 스타일러는 자주 입는 옷을 상태에 맞게 관리하는 데 도움을 줘요.","OLED TV":"집에서 영화나 드라마를 즐기는 시간이 소중하다면, 화면을 함께 바라보는 순간의 몰입감도 중요하겠어요. OLED TV는 둘이 보내는 영상 감상 시간을 더욱 풍성하게 만들어줘요.","스탠바이미":"집에서 쉬는 자리가 늘 같을 필요는 없겠죠. 스탠바이미는 원하는 공간으로 화면을 옮겨, 그날의 생활 동선과 기분에 맞춰 콘텐츠를 즐길 수 있게 해줘요.","STEM 얼음정수 냉장고":"시원한 음료를 즐기거나 손님을 자주 맞이한다면 음료를 준비하는 과정도 간편할수록 좋아요. 얼음과 물을 따로 챙기는 수고를 줄여 일상의 편리함을 더해줘요.","김치냉장고":"식재료를 넉넉히 준비해 두는 생활이라면 보관 방식도 중요한 살림의 일부예요. 김치냉장고는 재료에 맞는 보관 공간을 마련해 계획적인 식재료 관리를 도와줘요.","드로어 냉장고":"주방에서 자주 쓰는 재료를 편하게 꺼낼 수 있다면 요리의 흐름도 한결 가벼워져요. 드로어 냉장고는 식재료를 구분해 보관하고 사용하는 동선을 편리하게 만들어줘요.","인덕션":"직접 요리하는 즐거움을 오래 유지하려면 조리 과정과 뒷정리도 편해야 해요. 인덕션은 화력 조절과 상판 관리를 간편하게 해 주방에서의 수고를 줄이는 데 도움을 줘요.","광파오븐":"익숙한 집밥에도 새로운 메뉴를 더해보고 싶다면 조리 방식의 선택지가 넓을수록 즐겁겠죠. 광파오븐은 여러 조리 방식을 활용해 집에서 만드는 음식의 폭을 넓혀줘요."};
 
-function listProducts(items,answers=[]){const valid=items.map(p=>({p,story:recommendationNarrative(p,answers)})).filter(x=>x.story);return '<div class="rec-list">'+valid.map((x,i)=>'<div class="rec"><b>'+(i+1)+'. '+esc(x.p)+'</b><div class="rec-evidence">'+x.story.split('\n\n').map(t=>'<p>'+esc(t)+'</p>').join('')+'</div></div>').join('')+'</div>';}
+function listProducts(items,answers=[]){const valid=items.map(p=>({p,story:recommendationNarrative(p,answers)})).filter(x=>x.story);return '<div class="rec-list">'+valid.map((x,i)=>'<div class="rec"><b>'+(['✨','🌿','💡'][i%3])+' '+esc(x.p)+'</b><div class="rec-evidence">'+x.story.split('\n\n').map(t=>'<p>'+esc(t)+'</p>').join('')+'</div></div>').join('')+'</div>';}
 function needText(answers){
 let all=answers.flat();
 let rest=answers.some(a=>a[10]===0||a[18]===0),home=answers.some(a=>a[5]===0),storage=answers.some(a=>a[3]===0||a[4]===0),content=answers.some(a=>a[17]===0);
@@ -439,7 +439,7 @@ entrySending=true;button.disabled=true;button.textContent='응모 정보를 전�
 try{
 await fetch(ENTRY_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
 status.textContent='제출이 완료되었습니다.';
-button.textContent='결과 보기';button.disabled=false;button.onclick=()=>showReport(0);
+button.textContent='결과 보기';button.disabled=false;button.onclick=()=>showReport(1);
 }catch(e){
 status.textContent='전송 요청이 실패했어요. 인터넷 연결을 확인하고 다시 시도해 주세요.';
 button.textContent='다시 전송하기';button.disabled=false;
@@ -449,7 +449,7 @@ function render(){
 document.querySelector('main').classList.toggle('report-view',state.page==='report');
 if(state.page!=='event'&&state.page!=='report'){oldRender();return}
 if(state.page==='event')app.innerHTML='<div class="eyebrow">A LITTLE GIFT FOR YOU</div><h2>커피 선물 응모하고<br>결과를 확인해 보세요 ☕</h2><p>신랑·신부 중 한 분의 번호만 입력해도 돼요. 각자 커피 쿠폰을 안내받으시려면 두 번호를 입력해 주세요.</p><label>결혼 예정 연월 <span style="color:#b65f58">(필수)</span><input id="weddingMonth" type="month" required></label><label>신랑님 휴대전화 번호<input id="phoneG" type="tel" placeholder="010-0000-0000" autocomplete="off"></label><label>신부님 휴대전화 번호<input id="phoneB" type="tel" placeholder="010-0000-0000" autocomplete="off"></label><section class="privacy-panel"><div class="privacy-head"><span class="privacy-kicker">PRIVACY NOTICE</span><h3>개인정보 수집·이용 안내</h3><p>커피 선물 응모 및 쿠폰 발송을 위해 아래 정보를 수집합니다.</p></div><dl class="privacy-facts"><div><dt>수집 항목</dt><dd>신랑·신부 이름과 연락처, 결혼 예정 연월, 각 25문항 응답, 분석 결과, 동의 여부, 접수 일시</dd></div><div><dt>이용 목적</dt><dd>커피 선물 응모 관리 및 쿠폰 발송</dd></div><div><dt>보유 기간</dt><dd><strong>수집일로부터 2년</strong> (관련 법령상 보존 의무가 있는 경우 제외)</dd></div></dl><p class="privacy-note">필수 동의를 거부하실 수 있으나, 동의하지 않으면 이벤트 응모가 제한됩니다.</p><div class="privacy-consents"><label class="privacy-check"><input type="checkbox" id="privacyAgree"><span><b>[필수]</b> 개인정보 수집·이용에 동의합니다.</span></label><label class="privacy-check"><input type="checkbox" id="marketingAgree"><span><b>[선택]</b> LG전자 베스트샵 일도점의 가전 행사·할인 혜택 등 광고성 정보 문자 수신에 동의합니다.</span></label></div><p class="privacy-note"><strong>광고성 정보 발송:</strong> LG전자 베스트샵 일도점 (064-758-7722)<br>수신 거부 방법은 발송 문자에 안내됩니다.</p></section>' + '<button class="primary" id="entrySubmit" onclick="previewEvent()">응모하고 결과 보기</button><p class="small" id="entryStatus" role="status">결과는 이 화면에서 바로 확인할 수 있으며, 별도 문자로 발송되지 않습니다.</p>';
-if(state.page==='report')app.innerHTML=reportPage(reportIndex)+'<div class="report-nav">'+(reportIndex>0?btn('이전 결과 보기','showReport('+(reportIndex-1)+')','secondary'):'')+(reportIndex<2?btn(reportIndex===0?'신랑님 라이프스타일 보기 →':'신부님 라이프스타일 보기 →','showReport('+(reportIndex+1)+')'):btn('처음부터 다시 하기','location.reload()'))+'</div>';
+if(state.page==='report'){const order=[1,2,0],step=order.indexOf(reportIndex);app.innerHTML=reportPage(reportIndex)+'<div class="report-nav">'+(step>0?btn('이전 결과 보기','showReport('+order[step-1]+')','secondary'):'')+(step<2?btn(step===0?'신부님 라이프스타일 보기 →':'우리 부부 총평 보기 →','showReport('+order[step+1]+')'):btn('처음부터 다시 하기','location.reload()'))+'</div>';}
 }
 
 
@@ -466,7 +466,7 @@ const chosen=patterns[scenario]||patterns.balanced;
 state.names=['신랑','신부'];
 state.answers=chosen.map(a=>a.slice());
 state.page='report';
-reportIndex=0;
+reportIndex=1;
 }
 /* 25문항 라이프스타일 분석 v2 — 기존 이벤트/리포트 디자인 유지 */
 questions.splice(0,questions.length,...[["퇴근하고 배가 고픈 저녁, 우리 집 식탁은?","집밥파예요! 직접 요리해서 먹는 게 좋아요.","외식·배달파예요! 맛있는 건 사 먹는 게 최고예요."],["하루를 보내다 보면 나는?","해야 할 일을 하나씩 챙겨서 끝내는 편이에요.","다른 일에 집중하다 보면 하던 일을 깜빡할 때가 있어요."],["나의 하루의 끝은?","피곤한 하루를 보냈다면, 할 일이 조금 남아 있어도 일단 쉬고 싶어요.","피곤한 하루를 보냈어도, 할 일을 마쳐야 마음 편히 쉴 수 있어요."],["주말에 마트에 간 우리, 장바구니는?","일주일 정도는 너끈하게 먹을 만큼 넉넉하게 담아요.","2~3일 안에 신선하게 다 먹을 수 있도록 조금씩 담아요."],["집에서 먹을거리를 찾을 때 나는?","냉장고를 열고 이것저것 살펴보는 편이에요. 생각지도 못한 간식을 발견하기도 하거든요!","뭘 먹을지 먼저 정하고, 필요한 것만 꺼내는 편이에요."],["요즘 내가 푹 빠져 있는 건?","영화나 드라마, 예능처럼 다양한 콘텐츠를 즐기는 거예요.","운동이나 게임, 만들기처럼 직접 무언가를 하는 취미예요."],["영화나 드라마를 즐길 때 나는?","좋아하는 작품이라면 영화관까지 찾아가서 제대로 즐기는 편이에요.","어디서 보든 내용이 재미있으면 충분해요. 보는 환경은 크게 중요하지 않아요."],["집에서 나는 휴대폰을…","SNS나 영상, 검색 등으로 자주 들여다보는 편이에요.","필요할 때만 사용하고, 평소에는 잘 보지 않는 편이에요."],["카페에 가면 나의 커피 취향은?","얼죽아예요! 추워도 시원한 아이스커피가 좋아요.","뜨아파예요! 따뜻한 커피 한 잔이 최고예요."],["자기 전 1시간, 나는 이렇게 쓰고 싶어요.","둘이 함께 이야기하거나 좋아하는 일을 하면서 보내고 싶어요.","각자 좋아하는 일을 하면서 나만의 시간을 보내고 싶어요."],["모처럼 아무 약속 없는 토요일! 나는?","집에서 느긋하게 쉬면서 나만의 시간을 보내고 싶어요.","일단 나가고 싶어요! 재미있는 일을 찾아볼래요."],["갑자기 친구가 우리 집에 놀러 온다면?","좋아요! 맛있는 것도 준비해서 제대로 놀고 싶어요.","좋지만, 우리끼리 쉬는 시간도 소중해요."],["집이 조금 지저분해졌을 때 나는?","먼지나 어질러진 물건이 눈에 띄면 신경 쓰여요. 깨끗하게 유지하고 싶어요.","조금 지저분해도 크게 신경 쓰지 않아요. 생활하는 데 불편하지만 않으면 돼요."],["매일 반복되는 번거로운 일이 있다면?","편리한 방법이나 도구를 찾아 해결하고 싶어요.","익숙한 방식이면 조금 번거로워도 괜찮아요."],["나는 옷을 살 때?","좋은 옷을 하나 사서 오래 입는 걸 좋아해요.","매 시즌 새로운 옷을 사는 걸 좋아해요."],["한 번 입었지만 아직 세탁하기엔 애매한 옷, 나는?","바로 빨기는 아까워서 잘 걸어두고 다시 입어요.","한 번 입은 옷은 웬만하면 세탁하는 편이에요."],["욕실에 있는 칫솔이나 샤워타월, 나는?","교체할 때가 되면 미리미리 바꾸는 편이에요.","쓰는 데 문제없으면 조금 더 사용하는 편이에요."],["추운 겨울 아침, 씻으러 들어갈 때 나는?","따뜻한 물이 나올 때까지 기다렸다가 들어가요.","추워도 일단 들어가요! 빨리 씻고 나오면 돼요."],["마음에 드는 물건을 발견했다면?","여러 곳을 비교해 보고 사야 마음이 편해요.","마음에 들면 오래 고민하지 않고 사는 편이에요."],["새로운 물건을 고를 때 더 끌리는 건?","기능이 좋고 사용하기 편한 물건이요.","디자인이 예쁘고 제 취향에 맞는 물건이요."],["우리 집을 꾸밀 때 더 끌리는 건?","내 동선과 생활 방식에 딱 맞게 구성된 실용적인 공간이요.","누가 봐도 예쁘고, 내 취향이 돋보이는 감각적인 공간이요."],["나의 생활 방식에 더 가까운 것은?","돈을 조금 더 쓰더라도 여유 시간을 갖는 게 좋아요.","시간을 조금 더 쓰더라도 돈을 아끼는 게 좋아요."],["둘이 함께 중요한 일을 준비할 때 나는?","일정과 준비물을 미리 정해두면 마음이 편해요.","큰 방향만 정하고 상황에 맞춰 움직이는 게 좋아요."],["둘이 함께 집안일을 한다면?","각자 잘하는 일을 맡아서 책임지는 게 좋아요.","함께 시간을 맞춰서 같이 하는 게 좋아요."],["둘의 취향이 서로 다를 때 나는?","서로 조금씩 양보해서 둘 다 만족할 수 있는 방법을 찾고 싶어요.","각자의 취향을 존중하고, 서로 다른 방식으로 즐겨도 괜찮아요."]]);
@@ -651,13 +651,10 @@ reportPage=function(n){
  const r=coupleAnalyze(),a=state.answers[0],b=state.answers[1];
  if(n===0){
   const story=coupleDeep(r,a,b);
-  return '<div class="eyebrow">OUR NEWLYWED STORY · 01 / 03</div><div class="type-hero">'+titleIcon(r.type[1])+'<h2>'+esc(r.type[0])+'</h2><p>'+esc(r.type[2])+'</p></div><div class="card"><h3>💞 우리가 같은 선택을 한 질문</h3>'+compareCards(story.same,true)+'<p class="comparison-insight">'+esc(story.common)+'</p></div><div class="card"><h3>🌙 우리가 다르게 선택한 질문</h3>'+compareCards(story.diff,false)+'<p class="comparison-insight">'+esc(story.different)+'</p></div><div class="card"><h3>🌿 우리 부부의 핵심 특징과 총평</h3><div class="closing-headline">'+esc(story.synthesis.split('|')[0])+'</div><p>'+esc(story.synthesis.split('|')[1])+'</p><div class="key-advice"><span class="key-advice-label">우리 부부에게 필요한 한마디</span><strong>'+esc(story.takeaway)+'</strong></div></div><h3>두 분의 라이프스타일에 어울리는 가전</h3>'+(r.both.length?listProducts(r.both,[a,b]):'<p>이번 응답만으로 충분한 추천 근거가 확인되지 않았어요. 실제 생활에서 필요한 가전을 함께 살펴보세요.</p>');
+  return '<div class="eyebrow">OUR NEWLYWED STORY · 03 / 03</div><div class="type-hero">'+titleIcon(r.type[1])+'<h2>'+esc(r.type[0])+'</h2><p>'+esc(r.type[2])+'</p></div><div class="card"><h3>💞 우리가 같은 선택을 한 질문</h3>'+compareCards(story.same,true)+'<p class="comparison-insight">'+esc(story.common)+'</p></div><div class="card"><h3>🌙 우리가 다르게 선택한 질문</h3>'+compareCards(story.diff,false)+'<p class="comparison-insight">'+esc(story.different)+'</p></div><div class="card"><h3>🌿 우리 부부의 핵심 특징과 총평</h3><div class="closing-headline">'+esc(story.synthesis.split('|')[0])+'</div><p>'+esc(story.synthesis.split('|')[1])+'</p></div><h3>두 분의 라이프스타일에 어울리는 가전</h3>'+(r.both.length?listProducts(r.both.slice(0,3),[a,b]):'<p>이번 응답만으로 충분한 추천 근거가 확인되지 않았어요. 실제 생활에서 필요한 가전을 함께 살펴보세요.</p>')+(()=>{const shared=r.both.slice(0,3);const groom=rankedCandidates(a,null,shared).find(p=>recommendationNarrative(p,[a]));const bride=rankedCandidates(b,null,[...shared,...(groom?[groom]:[])]).find(p=>recommendationNarrative(p,[b]));return '<div class="card"><h3>🎯 신랑님 취향저격 가전</h3>'+(groom?listProducts([groom],[a]):'<p>이번 응답에서 충분한 추천 근거를 찾지 못했어요.</p>')+'</div><div class="card"><h3>🎯 신부님 취향저격 가전</h3>'+(bride?listProducts([bride],[b]):'<p>이번 응답에서 충분한 추천 근거를 찾지 못했어요.</p>')+'</div>'})();
  }
  const who=n===1?0:1,ind=who===0?r.x:r.y,profile=lifestyle[ind.primary],sub=lifestyle[ind.secondary],story=personalDeep(ind,state.answers[who]);
- const coupleProducts=r.both.filter(p=>recommendationNarrative(p,[a,b]));
- const groomProducts=rankedCandidates(a,null,coupleProducts).filter(p=>recommendationNarrative(p,[a])).slice(0,2);
- const personalProducts=who===0?groomProducts:rankedCandidates(b,null,[...coupleProducts,...groomProducts]).filter(p=>recommendationNarrative(p,[b])).slice(0,2);
- return '<div class="eyebrow">OUR NEWLYWED STORY · 0'+(n+1)+' / 03</div><div class="type-hero">'+titleIcon(profile[2])+'<h2>'+esc(state.names[who])+'님은<br>'+profile[1]+' '+profile[0]+'이에요</h2><p>'+profile[3]+'</p></div><div class="card"><h3>🌿 선택 속에 담긴 생활의 기준</h3><p>'+esc(story.first)+'</p></div><div class="card"><h3>✨ '+esc(state.names[who])+'님이 중요하게 생각하는 또 다른 가치</h3><p>'+esc(story.second)+'</p></div><h3>'+esc(state.names[who])+'님만의 취향을 반영한 추가 가전 추천</h3>'+(personalProducts.length?listProducts(personalProducts,[state.answers[who]]):'<p>추천 근거가 충분한 제품이 없어 이번에는 생활 성향 분석에 집중했어요.</p>');
+ return '<div class="eyebrow">OUR NEWLYWED STORY · 0'+n+' / 03</div><div class="type-hero">'+titleIcon(profile[2])+'<h2>'+esc(state.names[who])+'님은<br>'+profile[1]+' '+profile[0]+'이에요</h2><p>'+profile[3]+'</p></div><div class="card"><h3>🌿 선택 속에 담긴 생활의 기준</h3><p>'+esc(story.first)+'</p></div><div class="card"><h3>✨ '+esc(state.names[who])+'님이 중요하게 생각하는 또 다른 가치</h3><p>'+esc(story.second)+'</p></div>';
 };
 oldRender=function(){
  let h='';
@@ -733,11 +730,72 @@ function interpretedPersonal(ind,ans){
  ];
  const key=anchors[i][0],secondary=anchors[j][0];
  return {first:profileInsights[i][0]+' '+meanings[i][ans[key]]+' '+(key===2?'휴식과 집안일의 순서를 스스로 정할 수 있는 환경이 잘 맞겠어요.':key===9?'혼자만의 시간과 함께하는 시간을 어떻게 나눌지 생각해보면 좋아요.':'이런 생활 기준을 신혼집의 실제 선택에 적용해보면 좋아요.'),
- second:profileInsights[j][1]+' '+meanings[j][ans[secondary]]+' 서로 다른 두 기준은 모순이라기보다 상황에 따라 선택할 수 있는 생활의 균형점이에요.'};
+ second:profileInsights[j][1]+' '+meanings[j][ans[secondary]]};
 }
 coupleDeep=interpretedStory;
 personalDeep=interpretedPersonal;
 
+/* 실험용 3단계 리포트: 신랑 → 신부 → 부부 총평과 가전 추천 */
+const originalResultContent=reportPage;
+function personalExtra(who){
+ const a=state.answers[who];
+ // The three sections use distinct question clusters so the same trait is not paraphrased repeatedly.
+ const scenes=[
+  a[12]===0&&a[23]===0?'집의 상태가 눈에 들어오는 편이지만, 그 기준을 혼자 책임지고 싶다는 뜻은 아니에요. 정리할 일의 기준을 함께 정하면 훨씬 편안한 일상이 될 수 있어요.':
+  a[12]===0&&a[23]===1?'집이 정돈되어 있을 때 편안함을 느끼면서도, 집안일은 함께 움직이는 쪽을 선호해요. 누가 더 많이 했는지보다 같이 생활을 가꾼다는 감각이 중요할 수 있겠어요.':
+  a[12]===1&&a[23]===0?'집이 조금 어질러져 있어도 크게 신경 쓰지 않지만, 해야 할 일의 책임은 분명하게 나누는 편이에요. 느긋함과 무책임함은 다르다는 걸 보여주는 조합이에요.':
+  '집안의 작은 흐트러짐에는 관대하고, 필요할 때는 함께 손을 보태는 생활에 가까워요. 정해진 방식보다 그날의 상황에 맞춰 움직일 여지가 있으면 좋겠어요.'
+ ];
+ const scene=scenes[0];
+ const twist=a[22]===0&&a[18]===1?'생활의 큰 일정은 미리 준비하지만, 마음에 드는 물건은 오래 망설이지 않을 수 있어요. 계획적인 사람에게도 직감이 통하는 영역이 있는 거죠.':
+ a[22]===1&&a[18]===0?'일정은 유연하게 바꿔도 구매 앞에서는 비교하고 확인하는 시간을 아끼지 않아요. 즉흥적인 사람이라는 한마디로 설명하기 어려운 모습이에요.':
+ a[14]===0&&a[15]===1?'마음에 드는 옷은 오래 입고 싶어 하면서도, 입었던 옷은 바로 세탁하는 쪽을 택해요. 물건을 아끼는 마음과 매일의 쾌적함을 함께 챙기는 취향이에요.':
+ a[14]===1&&a[15]===0?'새로운 스타일을 즐기면서도 한 번 입은 옷을 무조건 세탁하지는 않아요. 변화를 좋아하는 취향과 생활에서의 실용적인 판단이 함께 나타나요.':
+ a[19]===1&&a[20]===0?'물건 자체의 디자인도 중요하지만 공간을 꾸릴 때는 쓰기 편한 구성을 우선해요. 눈에 띄는 멋보다 매일 쓰는 사람의 동선을 더 중시할 수 있겠어요.':
+ '하나의 기준이 모든 선택을 지배하지는 않아요. 일의 성격에 따라 신중함과 유연함의 비중을 다르게 두는 모습도 눈여겨볼 만해요.';
+ const partner=a[9]===0&&a[24]===1?'함께 보내는 시간을 좋아한다고 해서 모든 취향을 맞추고 싶은 건 아니에요. 같이 있는 시간과 각자 좋아하는 것을 누릴 자유가 모두 필요할 수 있어요.':
+ a[9]===1&&a[24]===0?'혼자 충전하는 시간은 필요하지만 중요한 선택에서는 두 사람이 납득할 답을 찾고 싶어 해요. 혼자 있고 싶다는 말이 상대와 거리를 두고 싶다는 뜻은 아닐 수 있어요.':
+ a[9]===0?'일과가 끝난 뒤 짧게라도 함께 이야기하는 시간이 관계의 온도를 느끼는 방법일 수 있어요. 긴 대화가 아니어도 서로에게 집중하는 순간이 의미 있을 거예요.':
+ '혼자 보내는 시간이 편안함을 회복하는 방식일 수 있어요. 그 시간을 존중받을 때 오히려 함께하는 순간에 더 마음을 쓸 여유가 생길 수 있겠어요.';
+ return '<div class="card"><h3>🏡 함께 살 때 드러나는 생활 습관</h3><p>'+esc(scene)+'</p></div>'+
+ '<div class="card"><h3>✨ 상대방도 몰랐던 나의 의외의 모습</h3><p>'+esc(twist)+'</p></div>'+
+ '<div class="card"><h3>💌 상대방이 알아두면 좋은 점</h3><p>'+esc(partner)+'</p></div>';
+}
+reportPage=function(step){
+ if(step===0||step===1){
+  const who=step;
+  let html=originalResultContent(who===0?1:2);
+  const cut=html.indexOf('<h3>'+esc(state.names[who])+'님만의 취향을 반영한 추가 가전 추천</h3>');
+  if(cut>=0)html=html.slice(0,cut);
+  html=html.replace(/OUR NEWLYWED STORY · 0[1-3] \/ 03/,'OUR NEWLYWED STORY · 0'+(step+1)+' / 03');
+  return html+personalExtra(who);
+ }
+ const r=coupleAnalyze(),a=state.answers[0],b=state.answers[1];
+ let html=originalResultContent(0);
+ const cut=html.indexOf('<h3>두 분의 라이프스타일에 어울리는 가전</h3>');
+ if(cut>=0)html=html.slice(0,cut);
+ html=html.replace(/OUR NEWLYWED STORY · 01 \/ 03/,'OUR NEWLYWED STORY · 03 / 03');
+ const picks=r.both.filter(p=>recommendationNarrative(p,[a,b])).slice(0,3);
+ const groom=rankedCandidates(a,null,picks).find(p=>!picks.includes(p)&&recommendationNarrative(p,[a]));
+ const bride=rankedCandidates(b,null,[...picks,...(groom?[groom]:[])]).find(p=>!picks.includes(p)&&p!==groom&&recommendationNarrative(p,[b]));
+ return html+'<h3 class="result-section-title">우리 부부에게 어울리는 가전</h3><p>두 사람의 생활 이야기를 바탕으로 함께 쓸 때 도움이 될 만한 제품을 골랐어요.</p>'+
+ (picks.length?'<h3 class="result-section-title">우리 부부의 생활에 어울리는 추천 '+picks.length+'가지</h3>'+listProducts(picks,[a,b]):'<div class="card"><p>이번 응답만으로 공통 추천 근거가 충분한 제품은 없었어요.</p></div>')+
+ '<h3 class="result-section-title">우리 각자의 취향저격 가전 꿀템</h3>'+
+ '<div class="card"><h3>💝 '+esc(state.names[0])+'님만의 취향저격 가전 꿀템</h3>'+(groom?listProducts([groom],[a]):'<p>공통 추천과 겹치지 않는 추가 제품의 근거가 충분하지 않아요.</p>')+'</div>'+
+ '<div class="card"><h3>💝 '+esc(state.names[1])+'님만의 취향저격 가전 꿀템</h3>'+(bride?listProducts([bride],[b]):'<p>공통 추천과 겹치지 않는 추가 제품의 근거가 충분하지 않아요.</p>')+'</div>'+
+ '<p class="small">응답을 바탕으로 한 생활 제안이며, 구매를 전제로 하지 않아요.</p>';
+};
+const originalFourStepRender=render;
+render=function(){
+ originalFourStepRender();
+ if(state.page!=='report')return;
+ const nav=app.querySelector('.report-nav');
+ if(!nav)return;
+ nav.innerHTML=(reportIndex>0?btn('이전 결과 보기','showReport('+(reportIndex-1)+')','secondary'):'')+
+ (reportIndex===0?btn('신부님 분석 보기 →','showReport(1)'):
+ reportIndex===1?btn('우리 부부 총평 보기 →','showReport(2)'):
+ btn('처음부터 다시 하기','location.reload()'));
+};
 loadPreviewFromUrl();
 render();
 </script></body></html>
