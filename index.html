@@ -780,9 +780,9 @@ reportPage=function(step){
  const bride=rankedCandidates(b,null,[...picks,...(groom?[groom]:[])]).find(p=>!picks.includes(p)&&p!==groom&&recommendationNarrative(p,[b]));
  return html+'<h3 class="result-section-title">우리 부부에게 어울리는 가전</h3><p>두 사람의 생활 이야기를 바탕으로 함께 쓸 때 도움이 될 만한 제품을 골랐어요.</p>'+
  (picks.length?'<h3 class="result-section-title">우리 부부의 생활에 어울리는 추천 '+picks.length+'가지</h3>'+listProducts(picks,[a,b]):'<div class="card"><p>이번 응답만으로 공통 추천 근거가 충분한 제품은 없었어요.</p></div>')+
- '<h3 class="result-section-title">우리 각자의 취향저격 가전 꿀템</h3>'+
- '<div class="card"><h3>💝 '+esc(state.names[0])+'님만의 취향저격 가전 꿀템</h3>'+(groom?listProducts([groom],[a]):'<p>공통 추천과 겹치지 않는 추가 제품의 근거가 충분하지 않아요.</p>')+'</div>'+
- '<div class="card"><h3>💝 '+esc(state.names[1])+'님만의 취향저격 가전 꿀템</h3>'+(bride?listProducts([bride],[b]):'<p>공통 추천과 겹치지 않는 추가 제품의 근거가 충분하지 않아요.</p>')+'</div>'+
+ ((groom||bride)?'<h3 class="result-section-title">우리 각자의 취향저격 가전 꿀템</h3>':'')+
+ (groom?'<div class="card"><h3>💝 '+esc(state.names[0])+'님만의 취향저격 가전 꿀템</h3>'+listProducts([groom],[a])+'</div>':'')+
+ (bride?'<div class="card"><h3>💝 '+esc(state.names[1])+'님만의 취향저격 가전 꿀템</h3>'+listProducts([bride],[b])+'</div>':'')+
  '<p class="small">응답을 바탕으로 한 생활 제안이며, 구매를 전제로 하지 않아요.</p>';
 };
 const originalFourStepRender=render;
