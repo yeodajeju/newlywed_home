@@ -738,7 +738,7 @@ function interpretedPersonal(ind,ans){
 coupleDeep=interpretedStory;
 personalDeep=interpretedPersonal;
 
-/* 실험용 4단계 리포트: 개인 분석 → 개인 분석 → 부부 총평 → 공통 가전 */
+/* 실험용 3단계 리포트: 신랑 → 신부 → 부부 총평과 가전 추천 */
 const originalResultContent=reportPage;
 function personalExtra(who){
  const a=state.answers[who],name=esc(state.names[who]);
@@ -762,20 +762,18 @@ reportPage=function(step){
   let html=originalResultContent(who===0?1:2);
   const cut=html.indexOf('<h3>'+esc(state.names[who])+'님만의 취향을 반영한 추가 가전 추천</h3>');
   if(cut>=0)html=html.slice(0,cut);
-  html=html.replace(/OUR NEWLYWED STORY · 0[1-3] \/ 03/,'OUR NEWLYWED STORY · 0'+(step+1)+' / 04');
+  html=html.replace(/OUR NEWLYWED STORY · 0[1-3] \/ 03/,'OUR NEWLYWED STORY · 0'+(step+1)+' / 03');
   return html+personalExtra(who);
  }
  const r=coupleAnalyze(),a=state.answers[0],b=state.answers[1];
- if(step===2){
-  let html=originalResultContent(0);
-  const cut=html.indexOf('<h3>두 분의 라이프스타일에 어울리는 가전</h3>');
-  if(cut>=0)html=html.slice(0,cut);
-  return html.replace(/OUR NEWLYWED STORY · 01 \/ 03/,'OUR NEWLYWED STORY · 03 / 04');
- }
+ let html=originalResultContent(0);
+ const cut=html.indexOf('<h3>두 분의 라이프스타일에 어울리는 가전</h3>');
+ if(cut>=0)html=html.slice(0,cut);
+ html=html.replace(/OUR NEWLYWED STORY · 01 \/ 03/,'OUR NEWLYWED STORY · 03 / 03');
  const picks=r.both.filter(p=>recommendationNarrative(p,[a,b])).slice(0,3);
  const groom=rankedCandidates(a,null,picks).find(p=>!picks.includes(p)&&recommendationNarrative(p,[a]));
  const bride=rankedCandidates(b,null,[...picks,...(groom?[groom]:[])]).find(p=>!picks.includes(p)&&p!==groom&&recommendationNarrative(p,[b]));
- return '<div class="eyebrow">OUR NEWLYWED STORY · 04 / 04</div><div class="type-hero"><h2>우리 부부에게 어울리는 가전</h2><p>두 사람의 생활 이야기를 바탕으로, 함께 쓸 때 도움이 될 만한 제품을 골랐어요.</p></div>'+
+ return html+'<h3 class="result-section-title">우리 부부에게 어울리는 가전</h3><p>두 사람의 생활 이야기를 바탕으로 함께 쓸 때 도움이 될 만한 제품을 골랐어요.</p>'+
  (picks.length?'<h3 class="result-section-title">우리 부부의 생활에 어울리는 추천 '+picks.length+'가지</h3>'+listProducts(picks,[a,b]):'<div class="card"><p>이번 응답만으로 공통 추천 근거가 충분한 제품은 없었어요.</p></div>')+
  '<h3 class="result-section-title">우리 각자의 취향저격 가전 꿀템</h3>'+
  '<div class="card"><h3>💝 '+esc(state.names[0])+'님만의 취향저격 가전 꿀템</h3>'+(groom?listProducts([groom],[a]):'<p>공통 추천과 겹치지 않는 추가 제품의 근거가 충분하지 않아요.</p>')+'</div>'+
@@ -791,7 +789,6 @@ render=function(){
  nav.innerHTML=(reportIndex>0?btn('이전 결과 보기','showReport('+(reportIndex-1)+')','secondary'):'')+
  (reportIndex===0?btn('신부님 분석 보기 →','showReport(1)'):
  reportIndex===1?btn('우리 부부 총평 보기 →','showReport(2)'):
- reportIndex===2?btn('우리 부부 추천 가전 보기 →','showReport(3)'):
  btn('처음부터 다시 하기','location.reload()'));
 };
 loadPreviewFromUrl();
